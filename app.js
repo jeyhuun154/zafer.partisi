@@ -846,5 +846,33 @@ async function init() {
     });
 }
 
+async function generateNewUserCode() {
+    if (!state.isAdmin) {
+        showToast('Sadece admin yapabilir', '❌');
+        return;
+    }
+    
+    const name = document.getElementById('new-user-name').value;
+    const code = document.getElementById('new-user-code').value;
+    
+    if (!name || !code) {
+        showToast('İsim ve kod girin', '⚠️');
+        return;
+    }
+    
+    const hash = await Crypto.sha256(code);
+    const display = document.getElementById('generated-hash');
+    display.style.display = 'block';
+    display.innerHTML = `
+        <strong>${name}</strong> için hash:<br>
+        <code style="background: var(--bg-secondary); padding: 4px; border-radius: 4px; user-select: all;">${hash}</code><br>
+        <small>Bu kodu app.js içindeki ACCESS_CODES array'ine ekleyin</small>
+    `;
+    
+    // Otomatik kopyalama
+    navigator.clipboard.writeText(hash);
+    showToast('Hash kopyalandı!', '✓');
+}
+
 // Başlat
 init();
