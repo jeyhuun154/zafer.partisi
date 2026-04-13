@@ -1,6 +1,6 @@
 // ==================== KONFİGÜRASYON ====================
 const CONFIG = {
-    ADMIN_NAME: 'Ceyhun Karaarslan',
+    ADMIN_NAME: 'admin',
     ADMIN_HASH: '147258', // 'admin123' için örnek
     ACCESS_CODES: [
         '147258',
