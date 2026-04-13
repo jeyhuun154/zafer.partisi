@@ -11,15 +11,6 @@ const CONFIG = {
     ITEMS_PER_PAGE: 10,
     SESSION_TIMEOUT: 30 * 24 * 60 * 60 * 1000, // 30 gün
     ENCRYPTION_KEY: 'zafer-partisi-gizli-anahtar-2026'
-
-        // Yeni: Kullanıcı kodu üretme fonksiyonu
-    generateAccessCode: async function(name, code) {
-        const hash = await Crypto.sha256(code);
-        console.log(`Yeni Kullanıcı: ${name}`);
-        console.log(`Kodu: ${code}`);
-        console.log(`Hash'i (APP.JS'e ekle): "${hash}"`);
-        return hash;
-    }
 };
 
 // ==================== GLOBAL STATE ====================
@@ -853,34 +844,6 @@ async function init() {
             navigateTo(e.state.screen);
         }
     });
-}
-
-async function generateNewUserCode() {
-    if (!state.isAdmin) {
-        showToast('Sadece admin yapabilir', '❌');
-        return;
-    }
-    
-    const name = document.getElementById('new-user-name').value;
-    const code = document.getElementById('new-user-code').value;
-    
-    if (!name || !code) {
-        showToast('İsim ve kod girin', '⚠️');
-        return;
-    }
-    
-    const hash = await Crypto.sha256(code);
-    const display = document.getElementById('generated-hash');
-    display.style.display = 'block';
-    display.innerHTML = `
-        <strong>${name}</strong> için hash:<br>
-        <code style="background: var(--bg-secondary); padding: 4px; border-radius: 4px; user-select: all;">${hash}</code><br>
-        <small>Bu kodu app.js içindeki ACCESS_CODES array'ine ekleyin</small>
-    `;
-    
-    // Otomatik kopyalama
-    navigator.clipboard.writeText(hash);
-    showToast('Hash kopyalandı!', '✓');
 }
 
 // Başlat
