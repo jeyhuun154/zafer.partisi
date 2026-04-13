@@ -1,9 +1,9 @@
 // ==================== KONFİGÜRASYON ====================
 const CONFIG = {
     ADMIN_NAME: 'Ceyhun Karaarslan',
-    ADMIN_HASH: '147258369', // 'admin123' için örnek
+    ADMIN_HASH: '147258', // 'admin123' için örnek
     ACCESS_CODES: [
-        '147258369',
+        '147258',
         // Diğer kodlar buraya eklenebilir
     ],
     DB_NAME: 'ZaferPartisiDB',
