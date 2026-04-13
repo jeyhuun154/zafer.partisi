@@ -6,423 +6,213 @@
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Zafer Partisi</title>
+    <title>Zafer Partisi - Üye Sistemi</title>
+    
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        :root { --bg: #fff; --bg2: #f5f5f7; --text: #1d1d1f; --text2: #86868b; --accent: #003366; --danger: #ff3b30; --success: #34c759; }
-        [data-theme="dark"] { --bg: #000; --bg2: #1c1c1e; --text: #fff; --text2: #8e8e93; --accent: #0a84ff; }
-        [data-theme="burokrat"] { --bg: #fefefe; --bg2: #f0f0f0; --text: #2c3e50; --text2: #7f8c8d; --accent: #34495e; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; width: 100vw; }
-        
-        /* DİKEY VIDEO */
-        #splash { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s; }
-        .video-wrapper { width: 100%; max-width: 500px; height: 100%; position: relative; }
-        #splash video { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
-        .screen { position: fixed; inset: 0; display: none; flex-direction: column; background: var(--bg); animation: fadeIn 0.4s ease; }
-        .screen.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Login */
-        .login-box { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; gap: 18px; max-width: 400px; margin: 0 auto; width: 100%; }
-        .logo { width: 120px; height: 120px; background: var(--accent); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 60px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,51,102,0.3); }
-        .input-wrap { width: 100%; }
-        .input-wrap label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; margin-bottom: 6px; display: block; }
-        .input-wrap input { width: 100%; padding: 16px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 12px; background: var(--bg2); color: var(--text); font-size: 16px; outline: none; }
-        .input-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,51,102,0.1); }
-        .btn { width: 100%; padding: 18px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,51,102,0.3); }
-        .btn:active { transform: scale(0.96); }
-        .btn-bio { background: var(--bg2); color: var(--text); border: 2px solid rgba(0,0,0,0.1); margin-top: 8px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-bio.active { background: var(--success); color: white; border-color: var(--success); }
-        
-        /* Main */
-        #main { justify-content: center; align-items: center; }
-        .settings { position: absolute; top: 50px; right: 20px; width: 45px; height: 45px; border-radius: 50%; background: var(--bg2); border: 1px solid rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; z-index: 100; }
-        .main-logo { width: 160px; height: 160px; background: var(--accent); border-radius: 32px; margin-bottom: 40px; display: flex; align-items: center; justify-content: center; font-size: 70px; animation: float 6s ease-in-out infinite; box-shadow: 0 30px 80px rgba(0,51,102,0.4); }
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
-        .pulse-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 30px; cursor: pointer; position: relative; box-shadow: 0 10px 40px rgba(0,51,102,0.4); display: flex; align-items: center; justify-content: center; }
-        .pulse-btn::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; z-index: -1; }
-        @keyframes pulse { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(1.5);opacity:0} }
-        .map-btn { position: absolute; bottom: 80px; width: 60px; height: 60px; font-size: 24px; }
-        
-        /* Theme */
-        .theme-pop { position: absolute; top: 110px; right: 20px; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border-radius: 16px; padding: 12px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); display: none; flex-direction: column; gap: 8px; z-index: 99; min-width: 160px; }
-        .theme-pop.show { display: flex; }
-        .theme-opt { padding: 12px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        .theme-opt:hover { background: rgba(0,0,0,0.05); }
-        .theme-opt.active { background: var(--accent); color: white; }
-        .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); }
-        .dot-default { background: linear-gradient(135deg,#fff 50%,#003366 50%); }
-        .dot-dark { background: #000; }
-        .dot-burokrat { background: #ecf0f1; }
-        
-        /* List */
-        .list-header { padding: 60px 20px 15px; background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50; display: flex; gap: 10px; }
-        .search { flex: 1; padding: 12px 16px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 12px; background: var(--bg2); color: var(--text); font-size: 16px; outline: none; }
-        .icon-btn { width: 45px; height: 45px; border-radius: 12px; background: var(--accent); color: white; border: none; font-size: 20px; cursor: pointer; display: none; align-items: center; justify-content: center; }
-        .icon-btn.visible { display: flex; }
-        .back { background: var(--bg2); color: var(--text); }
-        .list { flex: 1; overflow-y: auto; padding: 20px; }
-        .card { background: var(--bg2); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; gap: 15px; border: 1.5px solid rgba(0,0,0,0.05); animation: slideIn 0.4s ease; position: relative; }
-        @keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
-        .avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--accent); flex-shrink: 0; overflow: hidden; }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
-        .desc { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
-        .socials { display: flex; gap: 8px; }
-        .soc { width: 28px; height: 28px; border-radius: 6px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
-        .edit { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(0,0,0,0.05); cursor: pointer; font-size: 16px; }
-        .page { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.1); }
-        .pg-btn { width: 45px; height: 45px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.1); background: var(--bg2); color: var(--text); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .pg-btn:disabled { opacity: 0.3; }
-        
-        /* Map */
-        #map { flex: 1; width: 100%; background: #f0f0f0; }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 2000; justify-content: center; align-items: flex-end; }
-        .modal.show { display: flex; }
-        .modal-inner { background: var(--bg); width: 100%; max-width: 600px; border-radius: 24px 24px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 85vh; overflow-y: auto; }
-        .modal.show .modal-inner { transform: translateY(0); }
-        .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .modal-title { font-size: 22px; font-weight: 700; }
-        .x { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--bg2); font-size: 20px; cursor: pointer; }
-        .form { margin-bottom: 16px; }
-        .form label { display: block; font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; margin-bottom: 6px; }
-        .form input, .form textarea { width: 100%; padding: 14px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 12px; background: var(--bg2); color: var(--text); font-size: 15px; outline: none; }
-        .form textarea { resize: vertical; min-height: 80px; }
-        .loc-btn { width: 100%; padding: 12px; border: 2px dashed rgba(0,0,0,0.1); border-radius: 12px; background: transparent; color: var(--accent); font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
-        .coords { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btns { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1); }
-        .btn2 { flex: 1; padding: 16px; border-radius: 12px; border: 1.5px solid rgba(0,0,0,0.1); background: var(--bg2); color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; }
-        .btn-del { background: var(--danger); color: white; border-color: var(--danger); }
-        
-        /* Utils */
-        .offline { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--danger); color: white; padding: 12px 24px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; transition: all 0.4s; z-index: 9998; }
-        .offline.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: white; padding: 12px 24px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 10000; opacity: 0; transition: all 0.4s; pointer-events: none; }
-        .toast.show { top: 80px; opacity: 1; }
-        .loading { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column; color: white; gap: 16px; }
-        .loading.show { display: flex; }
-        .spin { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .dev { position: fixed; inset: 0; background: #000; z-index: 99999; display: none; justify-content: center; align-items: center; color: #fff; font-size: 24px; font-weight: 700; text-align: center; padding: 40px; }
-    </style>
+    
+    <!-- Stil Dosyası -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="dev" id="dev">🔒 Güvenlik İhlali Tespit Edildi</div>
-<div class="loading" id="loading"><div class="spin"></div><div>Yükleniyor...</div></div>
-<div class="toast" id="toast"></div>
-<div class="offline" id="offline">⚠️ Çevrimdışı Mod</div>
-
-<!-- SPLASH (DİKEY) -->
-<div id="splash">
-    <div class="video-wrapper">
-        <video id="vid" autoplay muted playsinline webkit-playsinline>
-            <!-- KENDİ DİKEY VİDIONU BURAYA KOY: src="video.mp4" -->
-            <source src="data:video/mp4;base64,AAAAGGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbXEwaXNvbTgAAABJbWZ0YQAAAAxmdGlkAAAAJmY4NTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMAAAACJtb2R0AAABHG1kYXQAAAIYdGVzdCB2aWRlbyBwbGFjZWhvbGRlcg==" type="video/mp4">
-        </video>
+    <!-- Güvenlik Engeli -->
+    <div id="security-block">
+        🔒 Güvenlik İhlali Tespit Edildi<br>
+        <span>Lütfen geliştirici araçlarını kapatın</span>
     </div>
-</div>
 
-<!-- LOGIN -->
-<div class="screen" id="login">
-    <div class="login-box">
-        <div class="logo">🦅</div>
-        <div class="input-wrap">
-            <label>Ad</label>
-            <input type="text" id="fn" placeholder="Adınız" autocomplete="off">
-        </div>
-        <div class="input-wrap">
-            <label>Soyad</label>
-            <input type="text" id="ln" placeholder="Soyadınız" autocomplete="off">
-        </div>
-        <div class="input-wrap">
-            <label>Özel Kod</label>
-            <input type="password" id="code" placeholder="••••••" autocomplete="off" maxlength="6">
-        </div>
-        <button class="btn" onclick="login()">Giriş Yap</button>
-        <button class="btn btn-bio" id="bioBtn" onclick="toggleBio()">👆 Biyometrik</button>
+    <!-- Yükleme Ekranı -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div>Yükleniyor...</div>
     </div>
-</div>
 
-<!-- MAIN -->
-<div class="screen" id="main">
-    <button class="settings" onclick="toggleTheme()">⚙️</button>
-    <div class="theme-pop" id="themePop">
-        <div class="theme-opt active" onclick="setTheme('default')"><div class="dot dot-default"></div>Varsayılan</div>
-        <div class="theme-opt" onclick="setTheme('dark')"><div class="dot dot-dark"></div>Koyu</div>
-        <div class="theme-opt" onclick="setTheme('burokrat')"><div class="dot dot-burokrat"></div>Klasik</div>
+    <!-- Bildirim -->
+    <div id="toast">
+        <span id="toast-icon">📡</span>
+        <span id="toast-msg">Bildirim</span>
     </div>
-    <div class="main-logo">🦅</div>
-    <button class="pulse-btn" onclick="go('list')">→</button>
-    <button class="pulse-btn map-btn" onclick="go('map')">🗺️</button>
-</div>
 
-<!-- LIST -->
-<div class="screen" id="list">
-    <div class="list-header">
-        <button class="icon-btn back" onclick="go('main')">←</button>
-        <input type="text" class="search" id="search" placeholder="Ara..." onkeyup="render()">
-        <button class="icon-btn" id="addBtn" onclick="openModal()">+</button>
+    <!-- Çevrimdışı Uyarısı -->
+    <div id="offline-bar">
+        <span>⚠️</span>
+        <span>Çevrimdışı Mod - Güncellemeler için internet bağlantısı gerekli</span>
     </div>
-    <div class="list" id="listBox"></div>
-    <div class="page">
-        <button class="pg-btn" onclick="page(-1)">←</button>
-        <span id="pg">1 / 1</span>
-        <button class="pg-btn" onclick="page(1)">→</button>
-    </div>
-</div>
 
-<!-- MAP -->
-<div class="screen" id="mapScr">
-    <div class="list-header">
-        <button class="icon-btn back" onclick="go('main')">←</button>
-        <span style="font-weight:700">Harita</span>
-        <button class="icon-btn" onclick="refreshMap()" style="background:var(--success)">⟳</button>
+    <!-- Splash Screen (Dikey Video) -->
+    <div id="splash-screen">
+        <div class="video-container">
+            <video id="splash-video" autoplay muted playsinline webkit-playsinline>
+                <!-- KENDİ DİKEY VİDIONU BURAYA KOY: src="intro.mp4" -->
+                <source src="intro.mp4" type="video/mp4">
+                Tarayıcınız video desteklemiyor
+            </video>
+            <div class="video-skip" onclick="forceSkipVideo()">Atla →</div>
+        </div>
     </div>
-    <div id="map"></div>
-</div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-    <div class="modal-inner">
-        <div class="modal-head">
-            <span class="modal-title" id="mTitle">Yeni Üye</span>
-            <button class="x" onclick="closeModal()">×</button>
-        </div>
-        <div class="form">
-            <label>Fotoğraf (Base64)</label>
-            <input type="text" id="mPhoto" placeholder="data:image...">
-        </div>
-        <div class="form">
-            <label>Ad Soyad</label>
-            <input type="text" id="mName" placeholder="İsim">
-        </div>
-        <div class="form">
-            <label>Açıklama</label>
-            <textarea id="mDesc" placeholder="Görev"></textarea>
-        </div>
-        <div class="form">
-            <label>Konum</label>
-            <button class="loc-btn" onclick="getLoc()">📍 Konum Al</button>
-            <div class="coords">
-                <input type="number" id="mLat" placeholder="Enlem" step="any">
-                <input type="number" id="mLng" placeholder="Boylam" step="any">
+    <!-- Login Ekranı -->
+    <div class="screen" id="login-screen">
+        <div class="login-container">
+            <div class="brand-logo">🦅</div>
+            
+            <div class="input-group">
+                <label>Ad</label>
+                <input type="text" id="input-firstname" placeholder="Adınızı girin" autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label>Soyad</label>
+                <input type="text" id="input-lastname" placeholder="Soyadınızı girin" autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label>Özel Kod</label>
+                <input type="password" id="input-code" placeholder="••••••" autocomplete="off" maxlength="6">
+            </div>
+
+            <button class="btn btn-primary" onclick="handleLogin()">Giriş Yap</button>
+            
+            <button class="btn btn-bio" id="btn-bio" onclick="toggleBiometric()">
+                <span class="bio-icon">👆</span>
+                <span class="bio-text">Biyometrik Doğrulama ile Giriş</span>
+            </button>
+            
+            <div class="security-info">
+                <span>🔐 SHA-256 & AES-256 Şifreleme Aktif</span>
             </div>
         </div>
-        <div class="form">
-            <label>Sosyal Medya</label>
-            <input type="text" id="mX" placeholder="X" style="margin-bottom:8px">
-            <input type="text" id="mIG" placeholder="Instagram" style="margin-bottom:8px">
-            <input type="text" id="mLI" placeholder="LinkedIn" style="margin-bottom:8px">
-            <input type="text" id="mWeb" placeholder="Web">
+    </div>
+
+    <!-- Ana Ekran -->
+    <div class="screen" id="main-screen">
+        <div class="top-bar">
+            <button class="btn-icon" onclick="showNotifications()">
+                🔔
+                <span class="badge" id="update-badge">1</span>
+            </button>
+            <button class="btn-icon" onclick="toggleSettings()">⚙️</button>
         </div>
-        <div class="btns">
-            <button class="btn2 btn-del" id="delBtn" style="display:none" onclick="del()">Sil</button>
-            <button class="btn2" onclick="closeModal()">İptal</button>
-            <button class="btn" onclick="save()" style="flex:1">Kaydet</button>
+        
+        <div class="theme-panel" id="theme-panel">
+            <div class="theme-item active" onclick="setTheme('default')">
+                <div class="color-dot dot-default"></div>
+                <span>Varsayılan</span>
+            </div>
+            <div class="theme-item" onclick="setTheme('dark')">
+                <div class="color-dot dot-dark"></div>
+                <span>Koyu Mod</span>
+            </div>
+            <div class="theme-item" onclick="setTheme('burokrat')">
+                <div class="color-dot dot-burokrat"></div>
+                <span>Klasik</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="hero-logo">🦅</div>
+            <div class="hero-text">Zafer Partisi</div>
+            
+            <button class="btn-pulse" onclick="navigateTo('list')">
+                <span class="pulse-ring"></span>
+                <span class="btn-icon-inner">→</span>
+            </button>
+            
+            <button class="btn-pulse btn-map" onclick="navigateTo('map')">
+                <span class="pulse-ring"></span>
+                <span class="btn-icon-inner">🗺️</span>
+            </button>
+        </div>
+
+        <div class="user-info" id="user-display"></div>
+    </div>
+
+    <!-- Liste Ekranı -->
+    <div class="screen" id="list-screen">
+        <div class="header">
+            <button class="btn-icon back" onclick="navigateTo('main')">←</button>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Üye ara..." onkeyup="renderMembers()">
+            </div>
+            <button class="btn-icon add" id="btn-add" onclick="openModal()">+</button>
+        </div>
+        
+        <div class="content-list" id="members-list"></div>
+
+        <div class="pagination">
+            <button class="page-btn" onclick="changePage(-1)">←</button>
+            <span class="page-info" id="page-info">1 / 1</span>
+            <button class="page-btn" onclick="changePage(1)">→</button>
         </div>
     </div>
-</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script>
-// KONFİG
-const CFG = {
-    ADMIN_HASH: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
-    ACCESS: ['8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92'],
-    PER_PAGE: 10
-};
+    <!-- Harita Ekranı -->
+    <div class="screen" id="map-screen">
+        <div class="header">
+            <button class="btn-icon back" onclick="navigateTo('main')">←</button>
+            <span class="header-title">Üye Haritası</span>
+            <button class="btn-icon refresh" onclick="refreshMap()">⟳</button>
+        </div>
+        <div id="map"></div>
+    </div>
 
-// STATE
-let user = null, isAdmin = false, bio = false, members = [], page = 1, editId = null, db = null, map = null, markers = [], sw = null;
+    <!-- Admin Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-sheet">
+            <div class="modal-header">
+                <h3 id="modal-title">Yeni Üye Ekle</h3>
+                <button class="btn-close" onclick="closeModal()">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Profil Fotoğrafı (Base64)</label>
+                    <input type="text" id="m-photo" placeholder="data:image/jpeg;base64,/9j/4AAQ...">
+                </div>
+                
+                <div class="form-group">
+                    <label>Ad Soyad *</label>
+                    <input type="text" id="m-name" placeholder="Ahmet Yılmaz">
+                </div>
+                
+                <div class="form-group">
+                    <label>Açıklama / Görev</label>
+                    <textarea id="m-desc" placeholder="İlçe Başkanı, Parti Üyesi..."></textarea>
+                </div>
 
-// KRYPTO
-const K = {
-    sha256: async (m) => { const e=new TextEncoder(), d=e.encode(m), h=await crypto.subtle.digest('SHA-256',d); return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); },
-    enc: async (t,p) => { const e=new TextEncoder(), d=e.encode(t), k=await K.gk(p), iv=crypto.getRandomValues(new Uint8Array(12)), c=await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},k,d), b=new Uint8Array(iv.length+c.byteLength); b.set(iv); b.set(new Uint8Array(c),iv.length); return btoa(String.fromCharCode(...b)); },
-    dec: async (c,p) => { try { const b=Uint8Array.from(atob(c),x=>x.charCodeAt(0)), iv=b.slice(0,12), d=b.slice(12), k=await K.gk(p), r=await crypto.subtle.decrypt({name:'AES-GCM',iv:iv},k,d); return new TextDecoder().decode(r); } catch(e){return null} },
-    gk: async (p) => { const e=new TextEncoder(), m=await crypto.subtle.importKey('raw',e.encode(p),{name:'PBKDF2'},false,['deriveKey']); return crypto.subtle.deriveKey({name:'PBKDF2',salt:e.encode('zp'),iterations:100000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt']); }
-};
+                <div class="form-group">
+                    <label>Konum (Harita için)</label>
+                    <button class="btn-location" onclick="getCurrentLocation()">
+                        📍 Mevcut Konumu Kullan
+                    </button>
+                    <div class="coords-inputs">
+                        <input type="number" id="m-lat" placeholder="Enlem" step="any">
+                        <input type="number" id="m-lng" placeholder="Boylam" step="any">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Sosyal Medya Linkleri</label>
+                    <input type="url" id="m-x" placeholder="X (Twitter) URL">
+                    <input type="url" id="m-ig" placeholder="Instagram URL">
+                    <input type="url" id="m-li" placeholder="LinkedIn URL">
+                    <input type="url" id="m-web" placeholder="Kişisel Web Sitesi">
+                </div>
+            </div>
 
-// BIO
-const Bio = {
-    sup: () => window.PublicKeyCredential !== undefined,
-    reg: async () => { try { const c=new Uint8Array(32); crypto.getRandomValues(c); const r=await navigator.credentials.create({publicKey:{challenge:c,rp:{name:'ZP',id:location.hostname},user:{id:new Uint8Array(16),name:user.full,displayName:user.full},pubKeyCredParams:[{alg:-7,type:'public-key'}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}}); const i=btoa(String.fromCharCode(...new Uint8Array(r.rawId))); await D.put('bio',{id:'cred',data:i,user:user.full}); return true; } catch(e){return false} },
-    auth: async () => { try { const s=await D.get('bio','cred'); if(!s)return false; const c=new Uint8Array(32); crypto.getRandomValues(c); const r=await navigator.credentials.get({publicKey:{challenge:c,allowCredentials:[{id:Uint8Array.from(atob(s.data),x=>x.charCodeAt(0)),type:'public-key',transports:['internal']}],userVerification:'required',timeout:60000}}); return !!r; } catch(e){return false} }
-};
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="btn-delete" style="display:none" onclick="deleteMember()">Sil</button>
+                <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+                <button class="btn btn-primary" onclick="saveMember()">Kaydet</button>
+            </div>
+        </div>
+    </div>
 
-// DB
-const D = {
-    init: () => new Promise((res,rej)=>{ const r=indexedDB.open('ZPDB',2); r.onsuccess=(e)=>{db=e.target.result;res()}; r.onerror=(e)=>rej(e); r.onupgradeneeded=(e)=>{ const d=e.target.result; if(!d.objectStoreNames.contains('m'))d.createObjectStore('m',{keyPath:'id',autoIncrement:true}); if(!d.objectStoreNames.contains('s'))d.createObjectStore('s',{keyPath:'k'}); if(!d.objectStoreNames.contains('bio'))d.createObjectStore('bio',{keyPath:'id'}); }; }),
-    put: (s,d) => new Promise((res,rej)=>{ const t=db.transaction([s],'readwrite'), o=t.objectStore(s), r=o.put(d); r.onsuccess=res; r.onerror=rej; }),
-    get: (s,k) => new Promise((res,rej)=>{ const t=db.transaction([s],'readonly'), o=t.objectStore(s), r=k?o.get(k):o.getAll(); r.onsuccess=(e)=>res(e.target.result); r.onerror=rej; }),
-    del: (s,k) => new Promise((res,rej)=>{ const t=db.transaction([s],'readwrite'), o=t.objectStore(s), r=o.delete(k); r.onsuccess=res; r.onerror=rej; })
-};
-
-// SW
-const SW_CODE = `const C='zafer-v2',T='tiles-v1'; self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['/','/index.html']))); self.skipWaiting()}); self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(n=>Promise.all(n.filter(x=>x!==C&&x!==T).map(x=>caches.delete(x))))); self.clients.claim()}); self.addEventListener('fetch',e=>{const u=new URL(e.request.url); if(u.hostname.includes('tile.openstreetmap.org')){e.respondWith(caches.open(T).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(f=>{c.put(e.request,f.clone());return f}).catch(()=>new Response('',{status:503})))));return} e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>{})))}); self.addEventListener('push',e=>{const d=e.data.json(); e.waitUntil(self.registration.showNotification('ZP',{body:d.body,icon:'data:image/png;base64,',badge:'data:image/png;base64,',vibrate:[200,100,200],data:d.data||{},actions:[{action:'open',title:'Aç'},{action:'close',title:'Kapat'}]}))}); self.addEventListener('notificationclick',e=>{e.notification.close(); if(e.action==='open'||!e.action)e.waitUntil(clients.openWindow(e.notification.data.url||'/'))});`;
-
-async function initSW() {
-    if(!('serviceWorker' in navigator))return;
-    try { const b=new Blob([SW_CODE],{type:'application/javascript'}), u=URL.createObjectURL(b); sw=await navigator.serviceWorker.register(u); if('PushManager' in window) await Notification.requestPermission(); } catch(e){}
-}
-
-// NET
-function initNet() {
-    window.addEventListener('online',()=>{ document.getElementById('offline').classList.remove('show'); toast('İnternet bağlantısı sağlandı'); if(sw&&'sync' in sw) sw.sync.register('sync'); });
-    window.addEventListener('offline',()=>{ document.getElementById('offline').classList.add('show'); toast('Çevrimdışı mod'); });
-    if(!navigator.onLine) document.getElementById('offline').classList.add('show');
-}
-
-function toast(m) {
-    const t=document.getElementById('toast');
-    t.textContent=m; t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),3000);
-}
-
-// VIDEO - KESİN ÇALIŞAN VERSİYON
-function initVideo() {
-    const v=document.getElementById('vid'), s=document.getElementById('splash');
-    let ended=false;
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
-    const finish = () => {
-        if(ended)return; ended=true;
-        s.style.opacity='0';
-        setTimeout(()=>{ s.style.display='none'; go('login'); },800);
-    };
-    
-    v.addEventListener('ended', finish);
-    v.addEventListener('error', ()=>{ console.log('Video hatası'); finish(); });
-    
-    // iOS için timeupdate kontrolü
-    v.addEventListener('timeupdate',()=>{
-        if(v.duration && v.currentTime >= v.duration-0.3) finish();
-    });
-    
-    // Zorunlu timeout (video yoksa bile 3sn sonra geç)
-    setTimeout(finish, 3000);
-    
-    // Eğer video metadata yüklenemezse hemen geç
-    v.addEventListener('stalled', ()=>setTimeout(finish,1000));
-}
-
-// AUTH
-async function login() {
-    const f=document.getElementById('fn').value.trim(), l=document.getElementById('ln').value.trim(), c=document.getElementById('code').value.trim();
-    if(!f||!l||!c){alert('Eksik alan');return;}
-    document.getElementById('loading').classList.add('show');
-    
-    try {
-        const h=await K.sha256(c), valid=CFG.ACCESS.includes(h);
-        if(!valid){alert('Geçersiz kod');document.getElementById('loading').classList.remove('show');return;}
-        
-        const full=f+' '+l, adm=full==='Ceyhun Karaarslan' && h===CFG.ADMIN_HASH;
-        
-        if(bio||adm){ const a=await Bio.auth(); if(!a&&adm){alert('Biyometrik gerekli');document.getElementById('loading').classList.remove('show');return;} }
-        
-        user={f,l,full}; isAdmin=adm;
-        await K.enc(JSON.stringify({user,adm,t:Date.now()}),c).then(d=>localStorage.setItem('s',d));
-        
-        if(adm&&await Bio.sup()){ const has=await D.get('bio','cred'); if(!has) await Bio.reg(); }
-        
-        document.getElementById('loading').classList.remove('show');
-        go('main');
-        if(adm) document.getElementById('addBtn').classList.add('visible');
-    } catch(e){ console.error(e); alert('Hata'); document.getElementById('loading').classList.remove('show'); }
-}
-
-async function toggleBio() {
-    const b=document.getElementById('bioBtn');
-    if(bio){bio=false;b.classList.remove('active');b.innerHTML='👆 Biyometrik';}
-    else { if(await Bio.sup()){bio=true;b.classList.add('active');b.innerHTML='✓ Biyometrik Aktif';toast('Biyometrik aktif');} else alert('Desteklenmiyor'); }
-}
-
-// NAV
-function go(id) {
-    document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
-    const t=document.getElementById(id);
-    if(t) {
-        t.classList.add('active');
-        if(id==='list') render();
-        if(id==='map') setTimeout(initMap,100);
-    }
-    if(id==='login') document.getElementById('splash').style.display='none';
-}
-
-function toggleTheme(){document.getElementById('themePop').classList.toggle('show');}
-function setTheme(t){
-    document.body.setAttribute('data-theme',t==='default'?'':t);
-    localStorage.setItem('t',t);
-    document.querySelectorAll('.theme-opt').forEach(x=>x.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    document.getElementById('themePop').classList.remove('show');
-}
-
-// CRUD
-async function render() {
-    const q=document.getElementById('search').value.toLowerCase();
-    members=await D.get('m')||[];
-    const f=members.filter(x=>x.name.toLowerCase().includes(q)||x.desc.toLowerCase().includes(q));
-    const st=(page-1)*CFG.PER_PAGE, en=st+CFG.PER_PAGE, pg=f.slice(st,en);
-    const box=document.getElementById('listBox');
-    box.innerHTML='';
-    pg.forEach(m=>{
-        const d=document.createElement('div'); d.className='card';
-        const def='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23ddd" width="100" height="100"/><text x="50%" y="50%" font-size="40" text-anchor="middle" dy=".3em">👤</text></svg>';
-        let s='';
-        if(m.x)s+='<div class="soc" onclick="window.open(\''+m.x+'\')">𝕏</div>';
-        if(m.ig)s+='<div class="soc" onclick="window.open(\''+m.ig+'\')">📷</div>';
-        if(m.li)s+='<div class="soc" onclick="window.open(\''+m.li+'\')">💼</div>';
-        if(m.web)s+='<div class="soc" onclick="window.open(\''+m.web+'\')">🌐</div>';
-        d.innerHTML='<div class="avatar"><img src="'+(m.photo||def)+'" onerror="this.src=\''+def+'\'"></div><div class="info"><div class="name">'+m.name+'</div><div class="desc">'+m.desc+'</div><div class="socials">'+s+'</div></div>'+(isAdmin?'<button class="edit" onclick="edit('+m.id+')">✏️</button>':'');
-        box.appendChild(d);
-    });
-    const tp=Math.ceil(f.length/CFG.PER_PAGE)||1;
-    document.getElementById('pg').textContent=page+' / '+tp;
-    document.querySelectorAll('.pg-btn')[0].disabled=page===1;
-    document.querySelectorAll('.pg-btn')[1].disabled=page>=tp;
-}
-
-function page(d){page+=d;render();}
-
-// MODAL
-function openModal(){editId=null;document.getElementById('mTitle').textContent='Yeni Üye';document.getElementById('delBtn').style.display='none';['mPhoto','mName','mDesc','mLat','mLng','mX','mIG','mLI','mWeb'].forEach(x=>document.getElementById(x).value='');document.getElementById('modal').classList.add('show');}
-function closeModal(){document.getElementById('modal').classList.remove('show');}
-async function edit(id){
-    const m=members.find(x=>x.id===id); if(!m)return;
-    editId=id; document.getElementById('mTitle').textContent='Düzenle'; document.getElementById('delBtn').style.display='block';
-    document.getElementById('mPhoto').value=m.photo||''; document.getElementById('mName').value=m.name; document.getElementById('mDesc').value=m.desc; document.getElementById('mLat').value=m.lat||''; document.getElementById('mLng').value=m.lng||''; document.getElementById('mX').value=m.x||''; document.getElementById('mIG').value=m.ig||''; document.getElementById('mLI').value=m.li||''; document.getElementById('mWeb').value=m.web||'';
-    document.getElementById('modal').classList.add('show');
-}
-async function save(){
-    const n=document.getElementById('mName').value.trim(); if(!n){alert('İsim gerekli');return;}
-    const o={photo:document.getElementById('mPhoto').value||null,name:n,desc:document.getElementById('mDesc').value,lat:parseFloat(document.getElementById('mLat').value)||null,lng:parseFloat(document.getElementById('mLng').value)||null,x:document.getElementById('mX').value,ig:document.getElementById('mIG').value,li:document.getElementById('mLI').value,web:document.getElementById('mWeb').value,t:Date.now()};
-    if(editId)o.id=editId;
-    await D.put('m',o);
-    if(!editId) toast('Yeni üye eklendi');
-    closeModal(); render(); if(map)plot();
-}
-async function del(){ if(!editId||!confirm('Silinsin mi?'))return; await D.del('m',editId); closeModal(); render(); if(map)plot(); }
-
-// MAP
-function initMap(){ if(map){map.invalidateSize();plot();return;} map=L.map('map').setView([39.9334,32.8597],6); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:19,crossOrigin:true}).addTo(map); plot(); }
-function plot(){ markers.forEach(x=>map.removeLayer(x)); markers=[]; members.forEach(m=>{if(m.lat&&m.lng){const mk=L.marker([m.lat,m.lng]).addTo(map).bindPopup('<b>'+m.name+'</b><br>'+m.desc); markers.push(mk);}}); }
-function refreshMap(){ if(map){map.invalidateSize();plot();} }
-async function getLoc(){ try{ const p=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:5000})); document.getElementById('mLat').value=p.coords.latitude.toFixed(6); document.getElementById('mLng').value=p.coords.longitude.toFixed(6); toast('Konum alındı'); }catch(e){alert('Konum alınamadı');} }
-
-// SEC
-(function(){ const th=160; setInterval(()=>{ const w=window.outerWidth-window.innerWidth>th, h=window.outerHeight-window.innerHeight>th; document.getElementById('dev').style.display=(w||h)?'flex':'none'; },500); setInterval(()=>{ const s=new Date(); debugger; const e=new Date(); if(e-s>100)location.href='about:blank'; },100); })();
-
-// INIT
-(async()=>{
-    const t=localStorage.getItem('t'); if(t&&t!=='default')document.body.setAttribute('data-theme',t);
-    await D.init(); await initSW(); initNet(); initVideo();
-})();
-</script>
+    <!-- Uygulama JS -->
+    <script src="app.js"></script>
 </body>
 </html>
