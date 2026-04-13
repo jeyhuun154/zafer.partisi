@@ -1,16 +1,16 @@
 // ==================== KONFİGÜRASYON ====================
 const CONFIG = {
     ADMIN_NAME: 'Ceyhun Karaarslan',
-    ADMIN_HASH: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', // 'admin123' için örnek
+    ADMIN_HASH: '147258369', // 'admin123' için örnek
     ACCESS_CODES: [
-        '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+        '147258369',
         // Diğer kodlar buraya eklenebilir
     ],
     DB_NAME: 'ZaferPartisiDB',
     DB_VERSION: 3,
     ITEMS_PER_PAGE: 10,
     SESSION_TIMEOUT: 30 * 24 * 60 * 60 * 1000, // 30 gün
-    ENCRYPTION_KEY: 'zafer-partisi-gizli-anahtar-2024'
+    ENCRYPTION_KEY: 'zafer-partisi-gizli-anahtar-2026'
 };
 
 // ==================== GLOBAL STATE ====================
