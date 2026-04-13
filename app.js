@@ -11,6 +11,15 @@ const CONFIG = {
     ITEMS_PER_PAGE: 10,
     SESSION_TIMEOUT: 30 * 24 * 60 * 60 * 1000, // 30 gün
     ENCRYPTION_KEY: 'zafer-partisi-gizli-anahtar-2026'
+
+        // Yeni: Kullanıcı kodu üretme fonksiyonu
+    generateAccessCode: async function(name, code) {
+        const hash = await Crypto.sha256(code);
+        console.log(`Yeni Kullanıcı: ${name}`);
+        console.log(`Kodu: ${code}`);
+        console.log(`Hash'i (APP.JS'e ekle): "${hash}"`);
+        return hash;
+    }
 };
 
 // ==================== GLOBAL STATE ====================
