@@ -29,5 +29,5 @@ const APP_CONFIG = {
 
   // ── FCM Web Push VAPID key ────────────────────────────────
   // Firebase Console → Project Settings → Cloud Messaging → Web Push certificates → Key pair
-  vapidKey: 'YOUR_VAPID_PUBLIC_KEY_HERE'
+  vapidKey: 'BEbEsZI8r9pmq9215CvX-LiGRqxtSCUutRNDb_oaNNjLHJWhmTyOz2WbXMWXjV0_W_1xjpsFGoBHVpoH9EWZiNE'
 };
