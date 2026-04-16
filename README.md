@@ -1,4 +1,4 @@
-# Zafer Partisi PWA — Kurulum Rehberi
+# Zafer Partisi PWA — Kurulum Rehberi v2
 
 ## 📁 Dosya Yapısı
 
@@ -6,149 +6,131 @@
 zaferpartisi/
 ├── index.html
 ├── manifest.json
-├── sw.js
+├── sw.js                        ← Service Worker
+├── firebase-messaging-sw.js     ← Push bildirim SW
+├── firestore.rules              ← Firebase güvenlik kuralları
 ├── assets/
-│   ├── intro.mp4          ← SENİN EKLEYECEĞİN (açılış videosu)
-│   ├── logo.png           ← SENİN EKLEYECEĞİN (logo)
-│   └── icons/
-│       ├── icon-72.png    ← PWA ikonları (tüm boyutlar lazım)
-│       ├── icon-96.png
-│       ├── icon-128.png
-│       ├── icon-144.png
-│       ├── icon-152.png
-│       ├── icon-192.png
-│       ├── icon-384.png
-│       └── icon-512.png
+│   ├── intro.mp4               ← SENİN EKLEYECEĞİN (açılış videosu)
+│   ├── logo.png                ← SENİN EKLEYECEĞİN (logo)
+│   ├── banner1.png             ← SENİN EKLEYECEĞİN (1. popup banner)
+│   ├── ataturk.png             ← SENİN EKLEYECEĞİN (2. popup Atatürk)
+│   └── icons/                  ← PWA ikonları (realfavicongenerator.net)
 ├── css/
 │   ├── base.css
 │   ├── themes.css
 │   ├── animations.css
 │   └── components.css
 └── js/
+    ├── config.js               ← POPUP METİNLERİ + HARİTA İKONLARI BURAYA
     ├── crypto.js
     ├── db.js
+    ├── firebase.js
     ├── auth.js
+    ├── notifications.js
     ├── ui.js
     ├── people.js
     ├── sync.js
-    └── app.js
+    ├── app.js
+    └── devtools.js
 ```
 
 ---
 
-## 🚀 Deploy Etme
+## 🚀 Deploy
 
-Bu bir **static web uygulaması**. Herhangi bir web sunucusuna yükleyebilirsin:
-- GitHub Pages
-- Netlify / Vercel (ücretsiz)
-- Kendi sunucun (Apache, Nginx)
-
-> ⚠️ **ZORUNLU:** Service Worker çalışması için uygulamanın **HTTPS** üzerinde çalışması şart.  
-> `localhost` HTTP'de de çalışır (geliştirme için).
+1. [Netlify](https://netlify.com) veya [Vercel](https://vercel.com)'e klasörü sürükle-bırak
+2. **HTTPS zorunlu** — Service Worker ve Push notifications HTTPS olmadan çalışmaz
+3. `firestore.rules` dosyasını Firebase Console → Firestore → Rules kısmına yapıştır
 
 ---
 
-## 🎬 Kendi Video & Logonu Ekle
+## 🔥 Firebase Kurulumu
 
-1. `assets/intro.mp4` → açılış videonu koy (MP4 format, kısa tut <5MB önerilir)
-2. `assets/logo.png` → logonu koy (tercihen 512x512, şeffaf arka plan)
-3. `assets/icons/` → PWA ikonlarını oluştur  
-   → [https://realfavicongenerator.net](https://realfavicongenerator.net) sitesinde logondan otomatik oluşturabilirsin
+### Firestore
+Firebase Console → Firestore Database → "Production mode" ile oluştur → Rules tab → `firestore.rules` içeriğini yapıştır → Publish
 
----
-
-## 👤 İlk Kullanım (Admin Kurulumu)
-
-1. Uygulamayı ilk açtığında giriş ekranı gelir
-2. **Ad:** `Ceyhun` · **Soyad:** `Karaarslan` yaz  
-3. **Özel Kod:** İstediğin kodu belirle (bu ilk girişte admin kodun olarak kaydedilir)
-4. Artık admin olarak girişin
-
-> Sonraki açılışlarda aynı bilgilerle giriş yaparsın.
-
----
-
-## 👥 Kullanıcı Ekleme
-
-1. Giriş yaptıktan sonra sağ üstteki ⚙️ **Ayarlar**'a bas
-2. **Kullanıcıları Yönet** seçeneğine bas
-3. **+** butonuyla yeni kullanıcı ekle (Ad, Soyad, Kod)
-4. Kullanıcıya adını, soyadını ve kodunu söyle
-
----
-
-## 🌐 Uzaktan Veri Senkronizasyonu (Opsiyonel)
-
-`js/sync.js` dosyasında `SYNC_URL` değişkenini güncelle:
-
-```javascript
-const SYNC_URL = 'https://yourdomain.com/data/people.json';
+### Firebase Storage
+Firebase Console → Storage → "Start in production mode" → Rules:
 ```
-
-JSON formatı:
-```json
-{
-  "people": [
-    {
-      "id": "unique_id",
-      "firstName": "Ad",
-      "lastName": "Soyad",
-      "description": "Açıklama",
-      "photoBase64": "data:image/jpeg;base64,...",
-      "order": 1,
-      "socials": {
-        "instagram": "https://instagram.com/...",
-        "twitter": null,
-        "linkedin": null,
-        "facebook": null,
-        "youtube": null
-      }
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if true;  // tighten after Firebase Auth
     }
-  ]
+  }
 }
 ```
 
----
-
-## 🎨 Temalar
-
-Sağ üstteki ⚙️ Ayarlar'dan 3 tema arasında geçiş yapılabilir:
-- **Varsayılan** — Beyaz, Lacivert, Açık Gri
-- **Koyu** — Siyah, Koyu Lacivert
-- **Açık** — Saf Beyaz, Gri tonlar
+### Push Notifications (FCM)
+1. Firebase Console → Project Settings → Cloud Messaging → **Web Push certificates** → **Generate key pair**
+2. Kopyala → `js/config.js` içinde `vapidKey: 'YOUR_VAPID_PUBLIC_KEY_HERE'` satırını güncelle
 
 ---
 
-## 📱 Ana Ekrana Ekleme (PWA Install)
+## 🎬 Asset Ekle
 
-**iOS Safari:**  
-Paylaş butonu → "Ana Ekrana Ekle"
+| Dosya | Ne |
+|---|---|
+| `assets/intro.mp4` | Açılış videosu (kısa, <5MB) |
+| `assets/logo.png` | Ana logo (512×512, şeffaf arka plan) |
+| `assets/banner1.png` | 1. hoşgeldin popup görseli |
+| `assets/ataturk.png` | 2. popup görseli (Atatürk fotoğrafı) |
 
-**Android Chrome:**  
-Otomatik "Uygulamayı Yükle" banner çıkar, yoksa ⋮ menüsü → "Ana ekrana ekle"
-
----
-
-## 🔐 Güvenlik Notları
-
-- Tüm kullanıcı verileri **AES-256-GCM** ile şifrelenip IndexedDB'ye kaydedilir
-- Kodlar **SHA-256** ile hash'lenir, hiçbir zaman plain text saklanmaz
-- DevTools'tan localStorage/IndexedDB'ye bakılsa sadece şifreli veri görünür
-- Admin paneline sadece Ceyhun Karaarslan hesabından erişilebilir
+PWA ikonları: [realfavicongenerator.net](https://realfavicongenerator.net) → logodan oluştur → `assets/icons/` klasörüne koy
 
 ---
 
-## 🛠️ Geliştirme
+## 📝 Popup Metinlerini Düzenle
 
-Yerel sunucu başlatmak için:
-```bash
-# Python 3
-python -m http.server 8080
+`js/config.js` dosyasını aç → `popups` dizisindeki `title` ve `description` alanlarını değiştir:
 
-# Node.js
-npx serve .
-
-# VS Code: Live Server extension
+```js
+popups: [
+  {
+    image:       'assets/banner1.png',
+    title:       'Başlık buraya',
+    description: 'Açıklama buraya...'
+  },
+  {
+    image:       'assets/ataturk.png',
+    title:       'İstiklâl Marşı',
+    description: 'İstiklal marşı mısraları...'
+  }
+]
 ```
 
-Ardından: `http://localhost:8080`
+---
+
+## 🗺️ Harita Konumları
+
+Adminler haritaya tıklayarak konum ekleyebilir:
+- İkon seçimi (Parti Binası, Etkinlik Yeri, Ofis, vb.)
+- **Planlı yayınlama**: "3 gün sonra paylaş", "belirli tarih" seçenekleri
+- **Otomatik silme**: "1 hafta sonra sil", "asla silme" vb.
+
+---
+
+## 👤 İlk Kullanım (Admin)
+
+1. Uygulamayı aç → giriş ekranı
+2. **Ad:** `Ceyhun` · **Soyad:** `Karaarslan` · **Kod:** istediğin kod
+3. İlk kayıt olarak admin hesabı oluşturulur
+4. Ayarlar → Kullanıcıları Yönet → kullanıcı ekle / admin yap / kodu sıfırla
+
+---
+
+## 📲 Push Notification
+
+Ayarlar → **Bildirim Gönder** → Tüm kayıtlı kullanıcılara anlık bildirim gider.
+Etkinlik eklenince/silinince de **otomatik** bildirim gönderilir.
+
+---
+
+## 🔐 Güvenlik
+
+- Şifreler SHA-256 hash → hiçbir zaman plain text saklanmaz
+- AES-256 ile şifreli session (IndexedDB)
+- DevTools: F12 / sağ tık / Ctrl+Shift+I bloklanır + boyut tespiti
+- Firestore'da tüm veri Firebase Rules ile korunur
