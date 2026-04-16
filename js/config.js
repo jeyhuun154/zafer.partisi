@@ -11,9 +11,9 @@ const APP_CONFIG = {
       description: 'Güçlü bir Türkiye için birlikte yürüyoruz. Zafer Partisi olarak sizlerin desteğiyle bu ülkeyi daha iyi bir geleceğe taşıyacağız.'
     },
     {
-      image:       'assets/ataturk.png',   // Atatürk fotoğrafı buraya
+      image:       'istiklal.png',   // Atatürk fotoğrafı buraya
       title:       'İstiklâl Marşı',
-      description: 'Korkma, sönmez bu şafaklarda yüzen al sancak;\nSönmeden yurdumun üstünde tüten en son ocak.\nO benim milletimin yıldızıdır, parlayacak;\nO benimdir, o benim milletimindir ancak.'
+      description: ''
     }
   ],
 
