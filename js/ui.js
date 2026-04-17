@@ -334,7 +334,7 @@ const UI = (() => {
       const img    = document.getElementById('photo-preview-img');
       const circle = document.getElementById('photo-preview-circle');
       if (img)    { img.src = ''; img.hidden = true; }
-      if (circle) circle.dataset.photoBase64 = '';
+      if (circle) _pendingPhotoBase64 = ''; circle.dataset.photoBase64 = '';
       removeBtn.setAttribute('hidden', '');
     });
 
