@@ -22,7 +22,7 @@ const People = (() => {
          const la = (a.lastName||'').toLowerCase(), lb = (b.lastName||'').toLowerCase();
          if (la !== lb) return la.localeCompare(lb, 'tr');
          return (a.firstName||'').toLowerCase().localeCompare((b.firstName||'').toLowerCase(), 'tr');
-      }};
+      });  // ✅ DÜZELTME
       _applyFilter();
       _render();
     });
@@ -36,7 +36,7 @@ const People = (() => {
          const la = (a.lastName||'').toLowerCase(), lb = (b.lastName||'').toLowerCase();
          if (la !== lb) return la.localeCompare(lb, 'tr');
          return (a.firstName||'').toLowerCase().localeCompare((b.firstName||'').toLowerCase(), 'tr');
-      }};
+      });  // ✅ DÜZELTME
     } catch {
       _allPeople = await DB.getAllPeople();
     }
@@ -86,9 +86,13 @@ const People = (() => {
 
     if (totalPages > 1) {
       paginEl?.classList.remove('hidden');
-      document.getElementById('page-indicator').textContent = `${_currentPage} / ${totalPages}`;
-      document.getElementById('prev-page-btn').disabled = (_currentPage === 1);
-      document.getElementById('next-page-btn').disabled = (_currentPage === totalPages);
+      const pageIndicator = document.getElementById('page-indicator');
+      const prevBtn = document.getElementById('prev-page-btn');
+      const nextBtn = document.getElementById('next-page-btn');
+      
+      if (pageIndicator) pageIndicator.textContent = `${_currentPage} / ${totalPages}`;
+      if (prevBtn) prevBtn.disabled = (_currentPage === 1);
+      if (nextBtn) nextBtn.disabled = (_currentPage === totalPages);
     } else {
       paginEl?.classList.add('hidden');
     }
@@ -267,10 +271,21 @@ const People = (() => {
   }
 
   function updateAdminUI() {
-    document.getElementById('add-person-btn')?.classList.toggle('hidden', !Auth.isAdmin());
+    const addBtn = document.getElementById('add-person-btn');
+    if (addBtn) addBtn.classList.toggle('hidden', !Auth.isAdmin());
   }
 
   function destroy() { _unsubscribe?.(); }
 
-  return { load, loadOnce, savePerson, deletePerson, search, nextPage, prevPage, updateAdminUI, destroy };
+  return { 
+    load, 
+    loadOnce, 
+    savePerson, 
+    deletePerson, 
+    search, 
+    nextPage, 
+    prevPage, 
+    updateAdminUI, 
+    destroy 
+  };
 })();
