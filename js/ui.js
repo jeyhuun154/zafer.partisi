@@ -3,7 +3,7 @@
    ============================================================ */
 
 const UI = (() => {
-  let _currentScreen = 'screen-splash';
+  let _currentScreen = 'screen-splash'; let _pendingPhotoBase64 = '';
 
   // ── Social media SVG icons (inline, no network needed) ───
   const SOCIAL_ICONS = {
@@ -244,7 +244,11 @@ const UI = (() => {
     if (!modal) return;
 
     // Clear form
-    _clearPersonForm();
+    function _clearPersonForm() {
+    ...
+    if (img) { img.src = ''; img.hidden = true; }
+    if (circle) _pendingPhotoBase64 = '';
+    if (circle) circle.dataset.photoBase64 = '';
 
     if (personData) {
       title.textContent = 'Kişiyi Düzenle';
@@ -301,13 +305,14 @@ const UI = (() => {
     }
   }
 
-  function getPersonFormData() {
+  function () {
     const circle = document.getElementById('photo-preview-circle');
     return {
       firstName:   document.getElementById('person-first-name').value.trim(),
       lastName:    document.getElementById('person-last-name').value.trim(),
       description: document.getElementById('person-desc').value.trim(),
-      photoBase64: circle?.dataset.photoBase64 || '',
+      photoBase64: _pendingPhotoBase64 || circle?.dataset.photoBase64 || '',
+
       socials: {
         instagram: document.getElementById('person-instagram').value.trim() || null,
         twitter:   document.getElementById('person-twitter').value.trim()   || null,
@@ -344,7 +349,7 @@ const UI = (() => {
           const img    = document.getElementById('photo-preview-img');
           const circle = document.getElementById('photo-preview-circle');
           if (img)    { img.src = resized; img.hidden = false; }
-          if (circle) circle.dataset.photoBase64 = resized;
+          if (circle) _pendingPhotoBase64 = ''; circle.dataset.photoBase64 = resized;
           document.getElementById('photo-remove-btn')?.removeAttribute('hidden');
         });
       };
@@ -481,7 +486,7 @@ const UI = (() => {
     init, showScreen, playSplash,
     showOfflineBanner, hideOfflineBanner, shakeLoginForm,
     openSettings, closeSettings, setTheme, loadTheme,
-    openPersonModal, closePersonModal, getPersonFormData, bindPhotoUpload,
+    openPersonModal, closePersonModal, , bindPhotoUpload,
     openUsersModal, closeUsersModal, renderUsersList,
     bindPasswordToggle,
     buildSocialLinks, SOCIAL_ICONS, SOCIAL_COLORS,
