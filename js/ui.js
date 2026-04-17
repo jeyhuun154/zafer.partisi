@@ -3,7 +3,8 @@
    ============================================================ */
 
 const UI = (() => {
-  let _currentScreen = 'screen-splash'; let _pendingPhotoBase64 = '';
+  let _currentScreen = 'screen-splash'; 
+  let _pendingPhotoBase64 = '';
 
   // ── Social media SVG icons (inline, no network needed) ───
   const SOCIAL_ICONS = {
@@ -243,19 +244,15 @@ const UI = (() => {
     const title  = document.getElementById('modal-person-title');
     if (!modal) return;
 
-    // Clear form
-    function _clearPersonForm() {
-    ...
-    if (img) { img.src = ''; img.hidden = true; }
-    if (circle) _pendingPhotoBase64 = '';
-    if (circle) circle.dataset.photoBase64 = '';
+    // Clear form first
+    _clearPersonForm();
 
     if (personData) {
-      title.textContent = 'Kişiyi Düzenle';
+      if (title) title.textContent = 'Kişiyi Düzenle';
       _fillPersonForm(personData);
       modal.dataset.editId = personData.id;
     } else {
-      title.textContent = 'Kişi Ekle';
+      if (title) title.textContent = 'Kişi Ekle';
       delete modal.dataset.editId;
     }
 
@@ -282,43 +279,64 @@ const UI = (() => {
     const img = document.getElementById('photo-preview-img');
     const circle = document.getElementById('photo-preview-circle');
     if (img) { img.src = ''; img.hidden = true; }
+    _pendingPhotoBase64 = '';
     if (circle) circle.dataset.photoBase64 = '';
-    document.getElementById('photo-remove-btn')?.setAttribute('hidden', '');
+    const removeBtn = document.getElementById('photo-remove-btn');
+    if (removeBtn) removeBtn.setAttribute('hidden', '');
   }
 
   function _fillPersonForm(p) {
-    document.getElementById('person-first-name').value = p.firstName || '';
-    document.getElementById('person-last-name').value  = p.lastName  || '';
-    document.getElementById('person-desc').value       = p.description || '';
-    document.getElementById('person-instagram').value  = p.socials?.instagram || '';
-    document.getElementById('person-twitter').value    = p.socials?.twitter   || '';
-    document.getElementById('person-linkedin').value   = p.socials?.linkedin  || '';
-    document.getElementById('person-facebook').value   = p.socials?.facebook  || '';
-    document.getElementById('person-youtube').value    = p.socials?.youtube   || '';
+    const firstNameEl = document.getElementById('person-first-name');
+    const lastNameEl = document.getElementById('person-last-name');
+    const descEl = document.getElementById('person-desc');
+    const instagramEl = document.getElementById('person-instagram');
+    const twitterEl = document.getElementById('person-twitter');
+    const linkedinEl = document.getElementById('person-linkedin');
+    const facebookEl = document.getElementById('person-facebook');
+    const youtubeEl = document.getElementById('person-youtube');
+
+    if (firstNameEl) firstNameEl.value = p.firstName || '';
+    if (lastNameEl) lastNameEl.value = p.lastName || '';
+    if (descEl) descEl.value = p.description || '';
+    if (instagramEl) instagramEl.value = p.socials?.instagram || '';
+    if (twitterEl) twitterEl.value = p.socials?.twitter || '';
+    if (linkedinEl) linkedinEl.value = p.socials?.linkedin || '';
+    if (facebookEl) facebookEl.value = p.socials?.facebook || '';
+    if (youtubeEl) youtubeEl.value = p.socials?.youtube || '';
 
     if (p.photoBase64) {
-      const img    = document.getElementById('photo-preview-img');
+      const img = document.getElementById('photo-preview-img');
       const circle = document.getElementById('photo-preview-circle');
       if (img) { img.src = p.photoBase64; img.hidden = false; }
       if (circle) circle.dataset.photoBase64 = p.photoBase64;
-      document.getElementById('photo-remove-btn')?.removeAttribute('hidden');
+      const removeBtn = document.getElementById('photo-remove-btn');
+      if (removeBtn) removeBtn.removeAttribute('hidden');
     }
   }
 
   function getPersonFormData() {
     const circle = document.getElementById('photo-preview-circle');
+    const firstNameEl = document.getElementById('person-first-name');
+    const lastNameEl = document.getElementById('person-last-name');
+    const descEl = document.getElementById('person-desc');
+    const instagramEl = document.getElementById('person-instagram');
+    const twitterEl = document.getElementById('person-twitter');
+    const linkedinEl = document.getElementById('person-linkedin');
+    const facebookEl = document.getElementById('person-facebook');
+    const youtubeEl = document.getElementById('person-youtube');
+
     return {
-      firstName:   document.getElementById('person-first-name').value.trim(),
-      lastName:    document.getElementById('person-last-name').value.trim(),
-      description: document.getElementById('person-desc').value.trim(),
-      photoBase64: _pendingPhotoBase64 || circle?.dataset.photoBase64 || '',
+      firstName:   firstNameEl ? firstNameEl.value.trim() : '',
+      lastName:    lastNameEl ? lastNameEl.value.trim() : '',
+      description: descEl ? descEl.value.trim() : '',
+      photoBase64: _pendingPhotoBase64 || (circle?.dataset.photoBase64) || '',
 
       socials: {
-        instagram: document.getElementById('person-instagram').value.trim() || null,
-        twitter:   document.getElementById('person-twitter').value.trim()   || null,
-        linkedin:  document.getElementById('person-linkedin').value.trim()  || null,
-        facebook:  document.getElementById('person-facebook').value.trim()  || null,
-        youtube:   document.getElementById('person-youtube').value.trim()   || null
+        instagram: instagramEl ? (instagramEl.value.trim() || null) : null,
+        twitter:   twitterEl ? (twitterEl.value.trim() || null) : null,
+        linkedin:  linkedinEl ? (linkedinEl.value.trim() || null) : null,
+        facebook:  facebookEl ? (facebookEl.value.trim() || null) : null,
+        youtube:   youtubeEl ? (youtubeEl.value.trim() || null) : null
       }
     };
   }
@@ -330,11 +348,13 @@ const UI = (() => {
     const removeBtn   = document.getElementById('photo-remove-btn');
 
     photoBtn?.addEventListener('click', () => photoInput?.click());
+    
     removeBtn?.addEventListener('click', () => {
       const img    = document.getElementById('photo-preview-img');
       const circle = document.getElementById('photo-preview-circle');
-      if (img)    { img.src = ''; img.hidden = true; }
-      if (circle) _pendingPhotoBase64 = ''; circle.dataset.photoBase64 = '';
+      if (img) { img.src = ''; img.hidden = true; }
+      _pendingPhotoBase64 = '';
+      if (circle) circle.dataset.photoBase64 = '';
       removeBtn.setAttribute('hidden', '');
     });
 
@@ -348,9 +368,11 @@ const UI = (() => {
         _resizeImage(base64, 300, (resized) => {
           const img    = document.getElementById('photo-preview-img');
           const circle = document.getElementById('photo-preview-circle');
-          if (img)    { img.src = resized; img.hidden = false; }
-          if (circle) _pendingPhotoBase64 = ''; circle.dataset.photoBase64 = resized;
-          document.getElementById('photo-remove-btn')?.removeAttribute('hidden');
+          if (img) { img.src = resized; img.hidden = false; }
+          _pendingPhotoBase64 = resized;
+          if (circle) circle.dataset.photoBase64 = resized;
+          const removeBtn = document.getElementById('photo-remove-btn');
+          if (removeBtn) removeBtn.removeAttribute('hidden');
         });
       };
       reader.readAsDataURL(file);
@@ -386,7 +408,8 @@ const UI = (() => {
     if (modal) {
       modal.setAttribute('aria-hidden', 'true');
       modal.classList.remove('modal-overlay--open');
-      document.getElementById('add-user-form')?.classList.add('hidden');
+      const addUserForm = document.getElementById('add-user-form');
+      if (addUserForm) addUserForm.classList.add('hidden');
     }
   }
 
@@ -534,6 +557,8 @@ const UIExtended = {
       // Show next popup after 500ms
       if (this._popupQueue.length > 0) {
         setTimeout(() => this._nextPopup(), 500);
+      } else {
+        this._popupActive = false;
       }
     };
     closeBtn?.addEventListener('click', onClose);
@@ -559,8 +584,10 @@ const UIExtended = {
       }
     }
 
-    document.getElementById('see-more-name').textContent = `${person.firstName} ${person.lastName}`;
-    document.getElementById('see-more-desc').textContent = person.description || '';
+    const nameEl = document.getElementById('see-more-name');
+    const descEl = document.getElementById('see-more-desc');
+    if (nameEl) nameEl.textContent = `${person.firstName} ${person.lastName}`;
+    if (descEl) descEl.textContent = person.description || '';
 
     // Notes
     const notesSection = document.getElementById('see-more-notes-section');
@@ -610,8 +637,9 @@ const UIExtended = {
   },
 
   closeMapActionModal() {
-    document.getElementById('modal-map-action')?.setAttribute('aria-hidden', 'true');
-    document.getElementById('modal-map-action')?.classList.remove('modal-overlay--open');
+    const modal = document.getElementById('modal-map-action');
+    modal?.setAttribute('aria-hidden', 'true');
+    modal?.classList.remove('modal-overlay--open');
   },
 
   getPendingLatLng() { return this._pendingLatLng; },
@@ -622,21 +650,32 @@ const UIExtended = {
   openMapPinModal(latlng) {
     this._pendingLatLng = latlng;
     this._selectedPinIcon = 'hq';
-    document.getElementById('pin-title-input').value = '';
-    document.getElementById('pin-desc-input').value  = '';
-    document.getElementById('pin-publish-select').value = 'now';
-    document.getElementById('pin-delete-select').value  = 'never';
-    document.getElementById('pin-publish-custom')?.classList.add('hidden');
-    document.getElementById('pin-delete-custom')?.classList.add('hidden');
+    
+    const titleInput = document.getElementById('pin-title-input');
+    const descInput = document.getElementById('pin-desc-input');
+    const publishSelect = document.getElementById('pin-publish-select');
+    const deleteSelect = document.getElementById('pin-delete-select');
+    const publishCustom = document.getElementById('pin-publish-custom');
+    const deleteCustom = document.getElementById('pin-delete-custom');
+    
+    if (titleInput) titleInput.value = '';
+    if (descInput) descInput.value = '';
+    if (publishSelect) publishSelect.value = 'now';
+    if (deleteSelect) deleteSelect.value = 'never';
+    publishCustom?.classList.add('hidden');
+    deleteCustom?.classList.add('hidden');
+    
     this._buildIconPicker();
+    
     const modal = document.getElementById('modal-map-pin');
     modal?.setAttribute('aria-hidden', 'false');
     modal?.classList.add('modal-overlay--open');
   },
 
   closeMapPinModal() {
-    document.getElementById('modal-map-pin')?.setAttribute('aria-hidden', 'true');
-    document.getElementById('modal-map-pin')?.classList.remove('modal-overlay--open');
+    const modal = document.getElementById('modal-map-pin');
+    modal?.setAttribute('aria-hidden', 'true');
+    modal?.classList.remove('modal-overlay--open');
   },
 
   _buildIconPicker() {
@@ -684,16 +723,20 @@ const UIExtended = {
 
   // ── Notify Modal ──────────────────────────────────────────
   openNotifyModal() {
-    document.getElementById('notify-title-input').value = '';
-    document.getElementById('notify-body-input').value  = '';
+    const titleInput = document.getElementById('notify-title-input');
+    const bodyInput = document.getElementById('notify-body-input');
+    if (titleInput) titleInput.value = '';
+    if (bodyInput) bodyInput.value = '';
+    
     const modal = document.getElementById('modal-notify');
     modal?.setAttribute('aria-hidden', 'false');
     modal?.classList.add('modal-overlay--open');
   },
 
   closeNotifyModal() {
-    document.getElementById('modal-notify')?.setAttribute('aria-hidden', 'true');
-    document.getElementById('modal-notify')?.classList.remove('modal-overlay--open');
+    const modal = document.getElementById('modal-notify');
+    modal?.setAttribute('aria-hidden', 'true');
+    modal?.classList.remove('modal-overlay--open');
   }
 };
 
