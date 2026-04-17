@@ -4,7 +4,7 @@
    ============================================================ */
 
 const People = (() => {
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 5;
 
   let _allPeople   = [];
   let _filtered    = [];
@@ -18,7 +18,11 @@ const People = (() => {
     _unsubscribe?.();
 
     _unsubscribe = FirebaseService.onSnapshot('people', (docs) => {
-      _allPeople = docs.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      _allPeople = docs.sort((a, b) => {
+         const la = (a.lastName||'').toLowerCase(), lb = (b.lastName||'').toLowerCase();
+         if (la !== lb) return la.localeCompare(lb, 'tr');
+         return (a.firstName||'').toLowerCase().localeCompare((b.firstName||'').toLowerCase(), 'tr');
+      }};
       _applyFilter();
       _render();
     });
@@ -28,7 +32,11 @@ const People = (() => {
   async function loadOnce() {
     try {
       const docs = await FirebaseService.getDocs('people');
-      _allPeople = docs.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      _allPeople = docs.sort((a, b) => {
+         const la = (a.lastName||'').toLowerCase(), lb = (b.lastName||'').toLowerCase();
+         if (la !== lb) return la.localeCompare(lb, 'tr');
+         return (a.firstName||'').toLowerCase().localeCompare((b.firstName||'').toLowerCase(), 'tr');
+      }};
     } catch {
       _allPeople = await DB.getAllPeople();
     }
