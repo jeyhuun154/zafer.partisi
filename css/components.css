@@ -1352,3 +1352,15 @@
   background: var(--color-bg);
   transition: background 0.3s ease;
 }
+
+.home-watermark {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  opacity: 0.35;
+  text-align: center;
+  letter-spacing: 0.03em;
+  margin-top: auto;
+  padding-bottom: 8px;
+  user-select: none;
+  pointer-events: none;
+}
