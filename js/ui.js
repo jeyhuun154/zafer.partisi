@@ -305,7 +305,7 @@ const UI = (() => {
     }
   }
 
-  function () {
+  function getPersonFormData() {
     const circle = document.getElementById('photo-preview-circle');
     return {
       firstName:   document.getElementById('person-first-name').value.trim(),
@@ -486,7 +486,7 @@ const UI = (() => {
     init, showScreen, playSplash,
     showOfflineBanner, hideOfflineBanner, shakeLoginForm,
     openSettings, closeSettings, setTheme, loadTheme,
-    openPersonModal, closePersonModal, , bindPhotoUpload,
+    openPersonModal, closePersonModal, getPersonFormData, bindPhotoUpload,
     openUsersModal, closeUsersModal, renderUsersList,
     bindPasswordToggle,
     buildSocialLinks, SOCIAL_ICONS, SOCIAL_COLORS,
