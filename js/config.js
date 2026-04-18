@@ -31,3 +31,21 @@ const APP_CONFIG = {
   // Firebase Console → Project Settings → Cloud Messaging → Web Push certificates → Key pair
   vapidKey: 'BEbEsZI8r9pmq9215CvX-LiGRqxtSCUutRNDb_oaNNjLHJWhmTyOz2WbXMWXjV0_W_1xjpsFGoBHVpoH9EWZiNE'
 };
+
+// ── Darıca sınır koordinatları (varsayılan, admin haritadan değiştirebilir) ──
+daricaBoundary: [
+   [40.7760, 29.5195],
+   [40.7820, 29.5420],
+   [40.7790, 29.5680],
+   [40.7700, 29.5920],
+   [40.7550, 29.6200],
+   [40.7350, 29.6280],
+   [40.7180, 29.6150],
+   [40.7090, 29.5900],
+   [40.7050, 29.5580],
+   [40.7100, 29.5300],
+   [40.7250, 29.5150],
+   [40.7480, 29.5120],
+   [40.7650, 29.5170],
+   [40.7760, 29.5195]
+   ]
