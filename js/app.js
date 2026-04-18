@@ -316,18 +316,128 @@
 
   function _initMap() {
     if (_mapInitialized) { setTimeout(() => _map?.invalidateSize(), 400); return; }
-    if (typeof L === 'undefined') { setTimeout(_initMap, 500); return; }
-    _map = L.map('leaflet-map', { center: [39.9334, 32.8597], zoom: 6 });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap', maxZoom: 19
-    }).addTo(_map);
-    _mapInitialized = true;
-    setTimeout(() => _map.invalidateSize(), 400);
-    if (Auth.isAdmin()) {
-      _map.on('click', e => UI.showMapActionModal(e.latlng));
-    }
-    _loadMapPins();
+     if (typeof L === 'undefined') { setTimeout(_initMap, 500); return; }
+
+     _map = L.map('leaflet-map', {
+        center: [40.748, 29.570], // Darıca merkezi
+        zoom: 13,
+        minZoom: 10,
+        maxZoom: 19,
+     });
+
+     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 19
+     }).addTo(_map);
+
+     _mapInitialized = true;
+     setTimeout(() => _map.invalidateSize(), 400);
+
+     // Darıca overlay yükle (önce Firestore'dan, yoksa config'den)
+     _loadDaricaOverlay();
+
+     // Admin: haritaya tıklayınca menü
+     if (Auth.isAdmin(() {
+        _map.on('click', e => {
+           if (_drawMode) {
+              _drawPoints.push([e.latlng.lat, e.latlng.lng]);
+              _updateDrawPreview();
+           } else {
+              UI.showMapActionModal(e.latlng);
+           }
+        });
+     }
+
+     // Admin toolbar (sınır çiz butonu)
+     if (Auth.isAdmin()) _addDrawToolbar();
+
+     _loadMapPins();
   }
+
+   // ── Darıca overlay ─────────────────────────────────────────
+   let _daricaOverlay = null;
+   let _daricaBorder  = null;
+
+   async function _loadDaricaOverlay() {
+      let boundary = APP_CONFIG.daricaBoundary;
+      try {
+         const saved = await FirebaseService.getDoc('settings', 'daricaBoundary');
+         if (saved?.coords?.length >= 3) boundary = saved.coords;
+      } catch {}
+      _applyDaricaOverlay(boundary);
+   }
+
+   function _applyDaricaOverlay(boundary) {
+      if (!_map || !boundary?.length) return;
+      _daricaOverlay?.remove();
+      _daricaBorder?.remove();
+
+      // Dünya bbox'u → içine Darıca deliği
+      _daricaOverlay = L.polygon(
+         [ [[-90,-180],[-90,180],[90,180]], boundary ],
+         { stroke: false, fillColor: '#000', fillOpacity: 0.22, interactive: false }
+         ).addTo(_map);
+
+         // Darıca çerçevesi (kesik çizgi)
+         _daricaBorder = L.polygon(boundary, {
+            color: '#1B2E6E', weight: 2, opacity: 0.55,
+            fillOpacity: 0, dashArray: '7 5', interactive: false
+         }).addTo(_map);
+   }
+
+   // ── Admin: sınır çizme modu ────────────────────────────────
+   let _drawMode   = false;
+   let _drawPoints = [];
+   let _drawPreview = null;
+
+   function _addDrawToolbar() {
+      const btn = L.control({ position: 'topright' });
+      btn.onAdd = () => {
+         const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+         div.innerHTML = `
+         <a id="draw-boundary-btn" href="#" title="Darıca Sınırı Çiz"
+           style="display:flex;align-items:center;justify-content:center;
+                  width:30px;height:30px;font-size:16px;text-decoration:none;
+                  color:var(--color-primary)" role="button">✏️</a>`;
+         L.DomEvent.disableClickProgration(div);
+         div.querySelector('#draw-boundary-btn').onclick = e => {
+            e.preventDefault();
+            if (_drawMode) _finishDraw(); else _startDraw();
+         };
+         return div;
+      };
+      btn.addTo(_map);
+   }
+
+   function _startDraw() {
+      _drawMode   = true;
+      _drawPoints = [];
+      _drawPreview?.remove();
+      _showToast('Noktaları tıklayarak seç. Bitirmek için ✏️ butonuna tekrar bas.');
+      document.getElementById('draw-boundary-btn').style.background = '#FF9500';
+      document.getElementById('draw-boundary-btn').style.color = '#fff';
+   }
+
+   function _updateDrawPreview () {
+      _drawPreview?.remove();
+      if (_drawPoints.lenght > 2) return;
+      _drawPreview = L.polyline(_drawPoints, {
+         color: '#FF9500', weight: 2, dashArray: '5 4'
+      }).addTo(_map);
+   }
+
+   async function _finishDraw() {
+      _drawMode = false;
+      document.getElementById('draw-boundary-btn').style.background = '';
+      document.getElementById('draw-boundary-btn').style.color = '';
+      _drawPreview?.remove();
+      if (_drawPoints.length < 3) { _showToast('En az 3nokta gerekli.'); return; }
+
+      // Poligonu kapat
+      const closed = [..._drawPoints, _drawPoints[0]];
+      await FirebaseService.setDoc('settings', 'daricaBoundary', { coords: closed });
+      _applyDaricaOverlay(closed);
+      _showToast('Sınır kaydedildi ✓');
+   }
 
   function _loadMapPins() {
     _pinsUnsub?.();
