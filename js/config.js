@@ -29,10 +29,9 @@ const APP_CONFIG = {
 
   // ── FCM Web Push VAPID key ────────────────────────────────
   // Firebase Console → Project Settings → Cloud Messaging → Web Push certificates → Key pair
-  vapidKey: 'BEbEsZI8r9pmq9215CvX-LiGRqxtSCUutRNDb_oaNNjLHJWhmTyOz2WbXMWXjV0_W_1xjpsFGoBHVpoH9EWZiNE'
-};
+  vapidKey: 'BEbEsZI8r9pmq9215CvX-LiGRqxtSCUutRNDb_oaNNjLHJWhmTyOz2WbXMWXjV0_W_1xjpsFGoBHVpoH9EWZiNE',
 
-// ── Darıca sınır koordinatları (varsayılan, admin haritadan değiştirebilir) ──
+   // ── Darıca sınır koordinatları (varsayılan, admin haritadan değiştirebilir) ──
 daricaBoundary: [
    [40.7760, 29.5195],
    [40.7820, 29.5420],
@@ -49,3 +48,4 @@ daricaBoundary: [
    [40.7650, 29.5170],
    [40.7760, 29.5195]
    ]
+};
