@@ -336,7 +336,7 @@
      _loadDaricaOverlay();
 
      // Admin: haritaya tıklayınca menü
-     if (Auth.isAdmin(() {
+     if (Auth.isAdmin()) {
         _map.on('click', e => {
            if (_drawMode) {
               _drawPoints.push([e.latlng.lat, e.latlng.lng]);
@@ -398,7 +398,7 @@
            style="display:flex;align-items:center;justify-content:center;
                   width:30px;height:30px;font-size:16px;text-decoration:none;
                   color:var(--color-primary)" role="button">✏️</a>`;
-         L.DomEvent.disableClickProgration(div);
+         L.DomEvent.disableClickPropagation(div);
          div.querySelector('#draw-boundary-btn').onclick = e => {
             e.preventDefault();
             if (_drawMode) _finishDraw(); else _startDraw();
@@ -419,7 +419,7 @@
 
    function _updateDrawPreview () {
       _drawPreview?.remove();
-      if (_drawPoints.lenght > 2) return;
+      if (_drawPoints.length > 2) return;
       _drawPreview = L.polyline(_drawPoints, {
          color: '#FF9500', weight: 2, dashArray: '5 4'
       }).addTo(_map);
@@ -430,7 +430,7 @@
       document.getElementById('draw-boundary-btn').style.background = '';
       document.getElementById('draw-boundary-btn').style.color = '';
       _drawPreview?.remove();
-      if (_drawPoints.length < 3) { _showToast('En az 3nokta gerekli.'); return; }
+      if (_drawPoints.length < 3) { _showToast('En az 3 nokta gerekli.'); return; }
 
       // Poligonu kapat
       const closed = [..._drawPoints, _drawPoints[0]];
