@@ -371,17 +371,18 @@
       _daricaOverlay?.remove();
       _daricaBorder?.remove();
 
-      // Dünya bbox'u → içine Darıca deliği
+      // Overlay polygon: z-index 200 (tiles=100, markers=400+)
+      // Markers (z=400) otomatik olarak üstte kalır, kararmaz
       _daricaOverlay = L.polygon(
-         [ [[-90,-180],[-90,180],[90,180]], boundary ],
-         { stroke: false, fillColor: '#000', fillOpacity: 0.22, interactive: false }
+         [ [[-90,-180],[-90,180],[90,180],[90,-180]], boundary ],
+         { stroke: false, fillColor: '#000', fillOpacity: 0.25,
+           interactive: false, pane: 'overlayPane' }  // overlayPane=400'ün altı
          ).addTo(_map);
 
-         // Darıca çerçevesi (kesik çizgi)
-         _daricaBorder = L.polygon(boundary, {
-            color: '#1B2E6E', weight: 2, opacity: 0.55,
-            fillOpacity: 0, dashArray: '7 5', interactive: false
-         }).addTo(_map);
+      _daricaBorder = L.polygon(boundary, {
+         color: '#1B2E6E', weight: 2, opacity: 0.6,
+         fillOpacity: 0, dashArray: '7 5', interactive: false
+      }).addTo(_map);
    }
 
    // ── Admin: sınır çizme modu ────────────────────────────────
