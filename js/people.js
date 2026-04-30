@@ -4,7 +4,7 @@
    ============================================================ */
 
 const People = (() => {
-  const PAGE_SIZE = 5;
+  const PAGE_SIZE = 10;
 
   let _allPeople   = [];
   let _filtered    = [];
@@ -86,17 +86,25 @@ const People = (() => {
 
     if (totalPages > 1) {
       paginEl?.classList.remove('hidden');
-      const pageIndicator = document.getElementById('page-indicator');
-      const prevBtn = document.getElementById('prev-page-btn');
-      const nextBtn = document.getElementById('next-page-btn');
-      
-      if (pageIndicator) pageIndicator.textContent = `${_currentPage} / ${totalPages}`;
-      if (prevBtn) prevBtn.disabled = (_currentPage === 1);
-      if (nextBtn) nextBtn.disabled = (_currentPage === totalPages);
+       document.getElementById('page-indicator').textContent = `${_currentPage} / ${totalPages}`;
+       document.getElementById('prev-page-btn').disabled = (_currentPage === 1);
+       document.getElementById('next-page-btn').disabled = (_currentPage === totalPages);
+       // Scroll ile ortaya çıkar
+       paginEl.style.opacity = '0';
+       paginEl.style.transition = 'opacity 0.25s ease';
+       const listEl2 = document.getElementById('people-list');
+       const revealFn = () => {
+          const nearBottom = listEl2.scrollTop + listEl2.clientHeight >= listEl2.scrollHeight - 50;
+          paginEl.style.opacity = nearBottom ? '1' : '0';
+          paginEl.style.pointerEvents = nearBottom ? 'all' : 'none';
+       };
+       listEl2?.removeEventListener('scroll', listEl2._paginScroll);
+       listEl2._paginScroll = revealFn;
+       listEl2?.addEventListener('scroll', revealFn, { passive: true });
+       revealFn(); // initial check
     } else {
-      paginEl?.classList.add('hidden');
+       paginEl?.classList.add('hidden');
     }
-  }
 
   function _buildCard(person) {
     const isAdmin = Auth.isAdmin();
