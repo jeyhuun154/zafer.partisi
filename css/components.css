@@ -1364,3 +1364,8 @@
   user-select: none;
   pointer-events: none;
 }
+
+.leaflet-marker-pane,
+.leaflet-popup-pane {
+  z-index: 650 !important;
+}
