@@ -719,17 +719,18 @@
       row.className = 'user-row';
       row.style.cssText = 'flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px';
 
-      const header = document.createElement('div');
-      header.style.cssText = 'display:flex;align-items:center;gap:8px';
-      header.innerHTML = `
-        <span class="user-row__name" style="flex:1">${UI._escHtml(u.firstName)} ${UI._escHtml(u.lastName)}</span>
-        ${uIsAdmin ? '<span class="user-row__badge">Admin</span>' : ''}
-        <button class="user-row-more-btn" data-uid="${u.id}" aria-label="Detaylar">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
-          </svg>
-        </button>`;
-      row.appendChild(header);
+     const header = document.createElement('div');
+     header.style.cssText = 'display:flex;align-items:center;gap:8px';
+     header.innerHTML = `
+       <span class="user-row__name" style="flex:1">${UI._escHtml(u.firstName)} ${UI._escHtml(u.lastName)}</span>
+       ${uIsAdmin ? '<span class="user-row__badge">Admin</span>' : ''}
+       <button class="user-row-more-btn" data-uid="${u.id}" aria-label="Detaylar">
+         <svg viewBox="0 0 24 24" fill="currentColor">
+           <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+         </svg>
+       </button>
+     `;
+     row.appendChild(header);
 
       // Action buttons
       const actions = document.createElement('div');
