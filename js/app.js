@@ -393,11 +393,9 @@
       const btn = L.control({ position: 'topright' });
       btn.onAdd = () => {
          const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-         div.innerHTML = `
-         <a id="draw-boundary-btn" href="#" title="Darıca Sınırı Çiz"
+         div.innerHTML = `<a id="draw-boundary-btn" href="#" title="Sınır Çiz"
            style="display:flex;align-items:center;justify-content:center;
-                  width:30px;height:30px;font-size:16px;text-decoration:none;
-                  color:var(--color-primary)" role="button">✏️</a>`;
+                  width:30px;height:30px;font-size:16px;text-decoration:none" role="button">✏️</a>`;
          L.DomEvent.disableClickPropagation(div);
          div.querySelector('#draw-boundary-btn').onclick = e => {
             e.preventDefault();
@@ -411,34 +409,66 @@
    function _startDraw() {
       _drawMode   = true;
       _drawPoints = [];
-      _drawPreview?.remove();
-      _showToast('Noktaları tıklayarak seç. Bitirmek için ✏️ butonuna tekrar bas.');
-      document.getElementById('draw-boundary-btn').style.background = '#FF9500';
-      document.getElementById('draw-boundary-btn').style.color = '#fff';
+      _drawPreview?.remove(); _drawPreview = null;
+      _showToast('Sınırı çizmek için parmağınızı haritada sürükleyin. Bitirmek için ✏️ butonuna basın.');
+
+      // Paint-style: mousemove/touchmove ile sürekli nokta topla
+      _map.dragging.disable();
+      _map.getContainer().style.cursor = 'crosshair';
+
+      _map.on('mousemove', _onDrawMove);
+      _map.on('touchmove', _onDrawTouchMove);
+      _map.on('mousedown', _onDrawStart);
+      _map.on('touchstart', _onDrawStart);
+      _map.on('mouseup',   _onDrawStop);
+      _map.on('touchend',  _onDrawStop);
+
+      document.getElementById('draw-boundary-btn').textContent = '✅';
    }
 
-   function _updateDrawPreview () {
+   let _isPainting = false;
+
+   function _onDrawStart()     { _isPainting = true; }
+   function _onDrawStop()      { _isPainting = false; }
+   function _onDrawMove(e)     { if (_isPainting) { _drawPoints.push([e.latlng.lat, e.latlng.lng]); _updateDrawPreview(); } }
+   function _onDrawTouchMove(e){
+      if (!_isPainting) return;
+      const touch = e.originalEvent.touches[0];
+      const latlng = _map.containerPointToLatLng(L.point(touch.clientX, touch.clientY));
+      _drawPoints.push([latlng.lat, latlng.lng]);
+      _updateDrawPreview();
+   }
+
+   function _updateDrawPreview() {
       _drawPreview?.remove();
-      if (_drawPoints.length > 2) return;
-      _drawPreview = L.polyline(_drawPoints, {
-         color: '#FF9500', weight: 2, dashArray: '5 4'
+      if (_drawPoints.length < 2) return;
+      _drawPreview = L.polygon(_drawPoints, {
+         color: '#FF9500', weight: 2.5, dashArray: '6 4',
+         fill: false, interactive: false
       }).addTo(_map);
    }
 
    async function _finishDraw() {
-      _drawMode = false;
-      document.getElementById('draw-boundary-btn').style.background = '';
-      document.getElementById('draw-boundary-btn').style.color = '';
+      _drawMode = false; _isPainting = false;
+      _map.off('mousemove', _onDrawMove);
+      _map.off('touchmove', _onDrawTouchMove);
+      _map.off('mousedown', _onDrawStart);
+      _map.off('touchstart', _onDrawStart);
+      _map.off('mouseup',   _onDrawStop);
+      _map.off('touchend',  _onDrawStop);
+      _map.dragging.enable();
+      _map.getContainer().style.cursor = '';
       _drawPreview?.remove();
-      if (_drawPoints.length < 3) { _showToast('En az 3 nokta gerekli.'); return; }
+      document.getElementById('draw-boundary-btn').textContent = '✏️';
 
-      // Poligonu kapat
+      if (_drawPoints.length < 10) { _showToast('Sınır çizmek için sürükleyin.'); return; }
+
       const closed = [..._drawPoints, _drawPoints[0]];
       await FirebaseService.setDoc('settings', 'daricaBoundary', { coords: closed });
       _applyDaricaOverlay(closed);
       _showToast('Sınır kaydedildi ✓');
    }
-
+       
   function _loadMapPins() {
     _pinsUnsub?.();
     _pinsUnsub = FirebaseService.onSnapshot('mapPins', docs => {
