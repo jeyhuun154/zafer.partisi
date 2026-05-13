@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection - anyone can read (for login), write own only
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if true; // Registration needs this
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && resource.data.isSuperAdmin == true;
+    }
+
+    // People (members) collection - public read, admin write
+    match /people/{personId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Events collection - public read, authenticated write
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Map pins collection - public read, authenticated write
+    match /mapPins/{pinId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Settings collection - public read, authenticated write
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Notifications collection - authenticated only
+    match /notifications/{notifId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Pending actions - authenticated only
+    match /pendingActions/{actionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Catch-all: deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
