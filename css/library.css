@@ -46,6 +46,86 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
+/* ── Library Search Bar ──────────────────────────────────── */
+.lib-search-bar {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  padding: 8px 16px 10px;
+  background: var(--color-bg);
+  z-index: 9;
+  overflow: hidden;
+  max-height: 64px;
+  transition: max-height 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 0.22s ease,
+              padding 0.22s ease;
+}
+
+.lib-search-bar--hidden {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  pointer-events: none;
+}
+
+.lib-search-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-surface-elevated);
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  padding: 0 12px;
+  height: 40px;
+}
+
+.lib-search-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.lib-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--color-text);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.lib-search-input::placeholder { color: var(--color-placeholder); }
+.lib-search-input::-webkit-search-cancel-button { display: none; }
+
+.lib-search-clear {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: var(--color-border);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.15s;
+}
+.lib-search-clear svg { width: 12px; height: 12px; }
+.lib-search-clear:hover { background: var(--color-surface-hover); }
+
+/* Shift content down when search bar is open */
+.lib-content--search-open {
+  padding-top: 124px; /* 56px header + 64px search bar + breathing room */
+}
+
 /* ── Add Book FAB ────────────────────────────────────────── */
 .lib-add-fab {
   position: absolute;

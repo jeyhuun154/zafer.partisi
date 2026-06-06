@@ -9,10 +9,19 @@
   <meta name="apple-mobile-web-app-title" content="Zafer Partisi">
   <meta name="theme-color" content="#1B2E6E">
   <title>Zafer Partisi</title>
-  <!-- Splash bg BEFORE any CSS loads → no blue flash -->
+  <!-- Theme-aware pre-paint: apply saved theme before CSS renders to prevent flash -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('zp_theme')||'default';
+      var bg={default:'#F0F1F5',dark:'#0D0D0F',light:'#FFFFFF'}[t]||'#F0F1F5';
+      document.documentElement.setAttribute('data-theme',t);
+      document.documentElement.style.background=bg;
+    })();
+  </script>
+  <!-- Splash bg BEFORE any CSS loads → no flash -->
   <style>
-    html,body{background:#F0F1F5!important}
-    .app-shell{background:#F0F1F5!important}
+    html,body{background:var(--color-bg)!important}
+    .app-shell{background:var(--color-bg)!important}
     #screen-splash{background:#1B2E6E!important;opacity:1!important;transform:none!important;z-index:9998!important}
     /* Ensure all non-splash screens start invisible */
     .screen:not(#screen-splash){opacity:0;transform:translateX(20px)}
@@ -219,22 +228,24 @@
       <button id="header-register-btn" class="header-register-btn hidden" aria-label="Kayıt Ol">
         Kayıt Ol
       </button>
-      <button id="settings-btn" class="icon-btn" aria-label="Ayarlar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-      </button>
-      <!-- Dedicated notifications bell icon (registered users only) -->
-      <button id="notif-bell-btn" class="icon-btn hidden" aria-label="Bildirimler" style="position:relative">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-        </svg>
-        <span id="notif-bell-badge" class="notif-bell-badge hidden">0</span>
-      </button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <button id="settings-btn" class="icon-btn" aria-label="Ayarlar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+        <!-- Dedicated notifications bell icon (registered users only) -->
+        <button id="notif-bell-btn" class="icon-btn hidden" aria-label="Bildirimler" style="position:relative">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span id="notif-bell-badge" class="notif-bell-badge hidden">0</span>
+        </button>
+      </div>
     </header>
-    <div class="home-social-bar" style="position:absolute;top:0;left:16px;height:56px;display:flex;align-items:center;z-index:5">
+    <div class="home-social-bar" style="position:absolute;top:0;left:16px;height:56px;display:flex;align-items:center;z-index:15">
       <a id="social-instagram" href="https://www.instagram.com/zpgenclikdarica/" target="_blank" rel="noopener" class="home-social-link" aria-label="Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
@@ -1037,6 +1048,26 @@
               <line x1="8" y1="18" x2="21" y2="18"/>
               <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
               <line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+          </button>
+          <button class="lib-view-btn" id="lib-search-btn" aria-label="Kitap Ara" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!-- Collapsible search bar — hidden until search icon tapped -->
+      <div id="lib-search-bar" class="lib-search-bar lib-search-bar--hidden" aria-hidden="true">
+        <div class="lib-search-inner">
+          <svg class="lib-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="search" id="lib-search-input" class="lib-search-input"
+                 placeholder="Kitap, yazar veya konu ara…" autocomplete="off" spellcheck="false">
+          <button id="lib-search-clear" class="lib-search-clear hidden" aria-label="Aramayı temizle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
         </div>

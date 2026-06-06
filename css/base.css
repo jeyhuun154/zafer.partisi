@@ -33,7 +33,7 @@ body {
 
 /* Prevent any white flash during screen transitions */
 html {
-  background: var(--color-bg, #F0F1F5);
+  background: var(--color-bg);
 }
 
 /* ── Screens ────────────────────────────────────────────── */

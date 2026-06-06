@@ -1328,6 +1328,46 @@
   document.getElementById('lib-view-grid')?.addEventListener('click', () => Library.setViewMode('grid'));
   document.getElementById('lib-view-list')?.addEventListener('click', () => Library.setViewMode('list'));
 
+  // Search icon toggle
+  const _libSearchBtn   = document.getElementById('lib-search-btn');
+  const _libSearchBar   = document.getElementById('lib-search-bar');
+  const _libSearchInput = document.getElementById('lib-search-input');
+  const _libSearchClear = document.getElementById('lib-search-clear');
+  const _libContent     = document.querySelector('#screen-library .lib-content');
+
+  function _libToggleSearch() {
+    const isOpen = !_libSearchBar?.classList.contains('lib-search-bar--hidden');
+    if (isOpen) {
+      // Close
+      _libSearchBar?.classList.add('lib-search-bar--hidden');
+      _libSearchBar?.setAttribute('aria-hidden', 'true');
+      _libSearchBtn?.classList.remove('lib-view-btn--active');
+      _libContent?.classList.remove('lib-content--search-open');
+      if (_libSearchInput) { _libSearchInput.value = ''; Library.search(''); }
+    } else {
+      // Open
+      _libSearchBar?.classList.remove('lib-search-bar--hidden');
+      _libSearchBar?.setAttribute('aria-hidden', 'false');
+      _libSearchBtn?.classList.add('lib-view-btn--active');
+      _libContent?.classList.add('lib-content--search-open');
+      setTimeout(() => _libSearchInput?.focus(), 50);
+    }
+  }
+
+  _libSearchBtn?.addEventListener('click', _libToggleSearch);
+
+  _libSearchInput?.addEventListener('input', () => {
+    const q = _libSearchInput.value;
+    _libSearchClear?.classList.toggle('hidden', !q);
+    Library.search(q);
+  });
+
+  _libSearchClear?.addEventListener('click', () => {
+    if (_libSearchInput) { _libSearchInput.value = ''; _libSearchInput.focus(); }
+    _libSearchClear?.classList.add('hidden');
+    Library.search('');
+  });
+
   // Add book FAB (admin)
   document.getElementById('lib-add-btn')?.addEventListener('click', () => Library.openBookForm());
 

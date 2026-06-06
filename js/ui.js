@@ -273,6 +273,8 @@ const UI = (() => {
   // ── Theme ─────────────────────────────────────────────────
   async function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
+    // Mirror to localStorage for synchronous pre-paint read on next load
+    try { localStorage.setItem('zp_theme', theme); } catch {}
     await DB.setSetting('theme', theme);
     // Update PWA theme-color meta
     const meta = document.querySelector('meta[name="theme-color"]');
@@ -285,6 +287,8 @@ const UI = (() => {
   async function loadTheme() {
     const theme = await DB.getSetting('theme', 'default');
     document.documentElement.setAttribute('data-theme', theme);
+    // Keep localStorage in sync so next cold-start pre-paint script is accurate
+    try { localStorage.setItem('zp_theme', theme); } catch {}
   }
 
   // ── Person modal ──────────────────────────────────────────

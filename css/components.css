@@ -1320,7 +1320,10 @@
 /* Tighten home screen header so welcome + settings don't have a big gap */
 #screen-home .app-header {
   gap: 6px;
-  padding: 0 12px;
+  padding: 8px 12px;
+  height: auto;
+  min-height: 56px;
+  align-items: flex-start;
 }
 
 /* ── Register screen scrollable ──────────────────────────── */

@@ -9,6 +9,7 @@ const Library = (() => {
   let _unsubscribe = null;
   let _viewMode    = 'grid'; // 'grid' | 'list'
   let _expandedBookId = null;
+  let _searchQuery = '';
 
   // ── Real-time load ────────────────────────────────────────
   async function load() {
@@ -54,7 +55,17 @@ const Library = (() => {
 
     if (addBtn) addBtn.classList.toggle('hidden', !Auth.isAdmin());
 
-    if (_allBooks.length === 0) {
+    // Apply search filter
+    const q = _searchQuery.toLowerCase().trim();
+    const books = q
+      ? _allBooks.filter(b =>
+          (b.title       || '').toLowerCase().includes(q) ||
+          (b.author      || '').toLowerCase().includes(q) ||
+          (b.description || '').toLowerCase().includes(q)
+        )
+      : _allBooks;
+
+    if (books.length === 0) {
       gridEl.innerHTML = '';
       gridEl.className = 'library-grid';
       emptyEl?.classList.remove('hidden');
@@ -66,7 +77,7 @@ const Library = (() => {
 
     gridEl.style.opacity = '0';
     setTimeout(() => {
-      gridEl.innerHTML = _allBooks.map(b => _buildBookCard(b)).join('');
+      gridEl.innerHTML = books.map(b => _buildBookCard(b)).join('');
       gridEl.style.opacity = '1';
       gridEl.style.transition = 'opacity 0.2s ease';
       _bindCardEvents(gridEl);
@@ -509,11 +520,18 @@ const Library = (() => {
     _render();
   }
 
+  // ── Search ────────────────────────────────────────────────
+  function search(query) {
+    _searchQuery = (query || '').trim();
+    _render();
+  }
+
   function destroy() { _unsubscribe?.(); }
 
   return {
     load,
     destroy,
+    search,
     setViewMode,
     openBookForm: _openBookForm,
     closeBookForm: _closeBookForm,
