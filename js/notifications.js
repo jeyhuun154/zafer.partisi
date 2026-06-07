@@ -134,6 +134,15 @@ const Notifications = (() => {
         } else if (action.type === 'delete_book') {
           typeLabel = `<strong>${_esc(action.targetBookTitle || 'Kitap')}</strong> kitabı silinmek isteniyor`;
           icon = '📚';
+        } else if (action.type === 'map_pin_add') {
+          typeLabel = `Harita konumu ekleme: <strong>${_esc(action.pinData?.title || action.mapLabel || 'Konum')}</strong>`;
+          icon = '📍';
+        } else if (action.type === 'map_pin_delete') {
+          typeLabel = `Harita konumu silme: <strong>${_esc(action.mapLabel || 'Konum')}</strong>`;
+          icon = '🗺️';
+        } else if (action.type === 'map_boundary') {
+          typeLabel = `Darıca sınırı değişikliği <strong>(${action.boundaryData?.pointCount || '?'} nokta)</strong>`;
+          icon = '✏️';
         } else {
           typeLabel = `<strong>${_esc(action.targetUserName)}</strong> admin yapılmak isteniyor`;
           icon = '⭐';

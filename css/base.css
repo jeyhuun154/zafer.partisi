@@ -447,23 +447,17 @@ html {
 .lightbox-close svg { width: 20px; height: 20px; }
 
 /* ── Event Detail Modal ─────────────────────────────────── */
+/* Gallery is now a swipeable carousel built in JS — keep container neutral */
 .event-detail__gallery {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin: 0 -4px 16px;
-  padding: 0 4px;
+  margin: 0 0 16px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
 }
 
+/* Legacy img rule kept minimal — carousel controls its own img styles inline */
 .event-detail__gallery img {
-  height: 160px;
-  width: auto;
-  border-radius: 12px;
-  object-fit: cover;
-  flex-shrink: 0;
-  cursor: pointer;
-  background: var(--color-surface-elevated);
+  display: block;
 }
 
 .event-detail__date {

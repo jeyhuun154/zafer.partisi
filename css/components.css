@@ -1319,11 +1319,23 @@
 
 /* Tighten home screen header so welcome + settings don't have a big gap */
 #screen-home .app-header {
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 4px;
+  padding: 10px 12px 10px 16px;
   height: auto;
   min-height: 56px;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Welcome text: flex-shrink so it never pushes into the social bar area,
+   min-width: 0 allows text-overflow truncation on very long names */
+#screen-home .app-header > *:not(.icon-btn):not(button) {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: calc(100vw - 160px); /* reserve space: ~40px social icons area + ~40px settings btn + padding */
 }
 
 /* ── Register screen scrollable ──────────────────────────── */

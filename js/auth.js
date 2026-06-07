@@ -305,6 +305,58 @@ const Auth = (() => {
     return { success: true };
   }
 
+  // ── Request map change (any admin) ───────────────────────
+  // type: 'map_pin_add' | 'map_pin_delete' | 'map_boundary'
+  // payload: type-specific data (see approveAction for what is read back)
+  async function requestMapChange(type, payload) {
+    if (!isAdmin()) return { success: false, error: 'Yetkisiz.' };
+
+    // Super admin bypasses the approval queue — apply instantly
+    if (isSuperAdmin()) {
+      try {
+        if (type === 'map_pin_add') {
+          await FirebaseService.setDoc('mapPins', payload.pinData.id, payload.pinData);
+        } else if (type === 'map_pin_delete') {
+          if (payload.pinEventId) await FirebaseService.deleteDoc('events', payload.pinEventId);
+          await FirebaseService.deleteDoc('mapPins', payload.pinId);
+        } else if (type === 'map_boundary') {
+          await FirebaseService.setDoc('settings', 'daricaBoundary', payload.boundaryData);
+        }
+        return { success: true, immediate: true };
+      } catch (e) {
+        return { success: false, error: e.message || 'İşlem başarısız.' };
+      }
+    }
+
+    const actionId = CryptoManager.generateId();
+    const labelMap = {
+      map_pin_add:    payload.mapLabel || 'Konum ekleme',
+      map_pin_delete: payload.mapLabel || 'Konum silme',
+      map_boundary:   'Darıca sınırı değişikliği'
+    };
+
+    await FirebaseService.setDoc('pendingActions', actionId, {
+      id: actionId,
+      type,
+      ...payload,                      // pinData | pinId+pinEventId | boundaryData
+      mapLabel:      labelMap[type],
+      requesterId:   _currentUser.id,
+      requesterName: `${_currentUser.firstName} ${_currentUser.lastName}`,
+      status:        'pending',
+      createdAt:     Date.now()
+    });
+
+    await _logAction({
+      type:        type + '_requested',
+      mapLabel:    labelMap[type],
+      actorId:     _currentUser.id,
+      actorName:   `${_currentUser.firstName} ${_currentUser.lastName}`,
+      actionId
+    });
+
+    return { success: true, immediate: false };
+  }
+
   async function getPendingActions() {
     if (!isSuperAdmin()) return [];
     try {
@@ -346,6 +398,28 @@ const Auth = (() => {
         _currentUser = updated;
         await _saveSession(updated);
       }
+    } else if (action.type === 'map_pin_add') {
+      try {
+        await FirebaseService.setDoc('mapPins', action.pinData.id, action.pinData);
+      } catch (e) {
+        return { success: false, error: 'Konum eklenemedi: ' + (e.message || '') };
+      }
+    } else if (action.type === 'map_pin_delete') {
+      try {
+        // If linked to an event, delete the event too
+        if (action.pinEventId) {
+          await FirebaseService.deleteDoc('events', action.pinEventId);
+        }
+        await FirebaseService.deleteDoc('mapPins', action.pinId);
+      } catch (e) {
+        return { success: false, error: 'Konum silinemedi: ' + (e.message || '') };
+      }
+    } else if (action.type === 'map_boundary') {
+      try {
+        await FirebaseService.setDoc('settings', 'daricaBoundary', action.boundaryData);
+      } catch (e) {
+        return { success: false, error: 'Sınır kaydedilemedi: ' + (e.message || '') };
+      }
     }
 
     // Mark action as approved only after the main operation succeeded
@@ -356,12 +430,17 @@ const Auth = (() => {
       resolverName: `${_currentUser.firstName} ${_currentUser.lastName}`
     });
 
+    const _logTypeApproved = action.type === 'delete'          ? 'deletion_approved'
+                           : action.type === 'delete_book'     ? 'book_deletion_approved'
+                           : action.type === 'map_pin_add'     ? 'map_pin_add_approved'
+                           : action.type === 'map_pin_delete'  ? 'map_pin_delete_approved'
+                           : action.type === 'map_boundary'    ? 'map_boundary_approved'
+                           : 'promotion_approved';
+
     await _logAction({
-      type: action.type === 'delete' ? 'deletion_approved'
-          : action.type === 'delete_book' ? 'book_deletion_approved'
-          : 'promotion_approved',
+      type: _logTypeApproved,
       targetUserId:   action.targetUserId,
-      targetUserName: action.targetUserName || action.targetBookTitle,
+      targetUserName: action.targetUserName || action.targetBookTitle || action.mapLabel,
       actorId:        _currentUser.id,
       actorName:      `${_currentUser.firstName} ${_currentUser.lastName}`,
       actionId,
@@ -370,10 +449,13 @@ const Auth = (() => {
     });
 
     try {
-      const typeLabel = action.type === 'delete' ? 'silindi'
-                      : action.type === 'delete_book' ? 'kitap silindi'
+      const typeLabel = action.type === 'delete'         ? 'silindi'
+                      : action.type === 'delete_book'    ? 'kitap silindi'
+                      : action.type === 'map_pin_add'    ? 'harita konumu eklendi'
+                      : action.type === 'map_pin_delete' ? 'harita konumu silindi'
+                      : action.type === 'map_boundary'   ? 'harita sınırı güncellendi'
                       : 'admin yapıldı';
-      const targetName = action.targetUserName || action.targetBookTitle || '';
+      const targetName = action.targetUserName || action.targetBookTitle || action.mapLabel || '';
       await FirebaseService.sendNotification({
         title: `${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)}: ${targetName}`,
         body:  `Talep eden: ${action.requesterName} · Onaylayan: ${_currentUser.firstName} ${_currentUser.lastName}`
@@ -396,12 +478,17 @@ const Auth = (() => {
       resolverName: `${_currentUser.firstName} ${_currentUser.lastName}`
     });
 
+    const _logTypeRejected = action.type === 'delete'         ? 'deletion_rejected'
+                           : action.type === 'delete_book'    ? 'book_deletion_rejected'
+                           : action.type === 'map_pin_add'    ? 'map_pin_add_rejected'
+                           : action.type === 'map_pin_delete' ? 'map_pin_delete_rejected'
+                           : action.type === 'map_boundary'   ? 'map_boundary_rejected'
+                           : 'promotion_rejected';
+
     await _logAction({
-      type: action.type === 'delete' ? 'deletion_rejected'
-          : action.type === 'delete_book' ? 'book_deletion_rejected'
-          : 'promotion_rejected',
+      type: _logTypeRejected,
       targetUserId:   action.targetUserId,
-      targetUserName: action.targetUserName || action.targetBookTitle,
+      targetUserName: action.targetUserName || action.targetBookTitle || action.mapLabel,
       actorId:        _currentUser.id,
       actorName:      `${_currentUser.firstName} ${_currentUser.lastName}`,
       actionId,
@@ -410,10 +497,13 @@ const Auth = (() => {
     });
 
     try {
-      const typeLabel = action.type === 'delete' ? 'silme'
-                      : action.type === 'delete_book' ? 'kitap silme'
+      const typeLabel = action.type === 'delete'         ? 'silme'
+                      : action.type === 'delete_book'    ? 'kitap silme'
+                      : action.type === 'map_pin_add'    ? 'harita konumu ekleme'
+                      : action.type === 'map_pin_delete' ? 'harita konumu silme'
+                      : action.type === 'map_boundary'   ? 'harita sınırı değişikliği'
                       : 'admin terfisi';
-      const targetName = action.targetUserName || action.targetBookTitle || '';
+      const targetName = action.targetUserName || action.targetBookTitle || action.mapLabel || '';
       await FirebaseService.sendNotification({
         title: `${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)} talebi reddedildi: ${targetName}`,
         body:  `Talep eden: ${action.requesterName} · Reddeden: ${_currentUser.firstName} ${_currentUser.lastName}`
@@ -447,7 +537,8 @@ const Auth = (() => {
   return {
     init, login, register, logout, loginAsGuest,
     addUser, deleteUser, setAdminStatus, transferSuperAdmin, resetUserCode, getAllUsers,
-    requestDeleteUser, requestPromoteUser, getPendingActions, approveAction, rejectAction,
+    requestDeleteUser, requestPromoteUser, requestMapChange,
+    getPendingActions, approveAction, rejectAction,
     getUser, isAdmin, isSuperAdmin, isLoggedIn, isGuest,
     // Expose _nameHash for potential debug (no sensitive data)
   };

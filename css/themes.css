@@ -206,6 +206,10 @@ html[data-wallpaper] body {
 
 html[data-wallpaper] .screen {
   background: transparent !important;
+  /* Ensure each screen forms its own stacking/paint context so
+     animated children (e.g. home logo scaleIn) cannot bleed
+     through the transparent background into adjacent elements */
+  isolation: isolate;
 }
 
 /* Splash stays opaque */
@@ -346,6 +350,21 @@ html[data-wallpaper] .home-tile__icon svg {
   filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
 }
 
+/* Social bar — give the container itself a glass backdrop so the
+   raw wallpaper never shows through the gaps between icon buttons */
+html[data-wallpaper] .home-social-bar {
+  background: var(--glass-bg-heavy) !important;
+  backdrop-filter: var(--glass-blur-header) !important;
+  -webkit-backdrop-filter: var(--glass-blur-header) !important;
+  border-radius: 0 0 16px 0;
+  /* Extend to fill the full header height flush with app-header */
+  height: 56px !important;
+  padding: 0 8px !important;
+  margin: 0 !important;
+  /* Prevent shadow/paint from the home logo below from bleeding up */
+  isolation: isolate;
+}
+
 /* Social bar links */
 html[data-wallpaper] .home-social-link {
   background: var(--glass-bg-card) !important;
@@ -359,6 +378,15 @@ html[data-wallpaper] .home-social-link {
 html[data-wallpaper] .home-social-link--party {
   background: rgba(255,255,255,0.22) !important;
   border-color: rgba(255,255,255,0.40) !important;
+}
+
+/* Prevent the home logo's box-shadow from bleeding into the header zone */
+html[data-wallpaper] .home__logo-wrap {
+  isolation: isolate;
+}
+
+html[data-wallpaper] .home__logo {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════

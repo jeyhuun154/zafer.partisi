@@ -696,33 +696,36 @@
     // Close the polygon by repeating first point as a fresh object
     const closed = [...rounded, { lat: rounded[0].lat, lng: rounded[0].lng }];
 
-    _showToast('Sınır kaydediliyor...');
+    _showToast('Sınır değişikliği talep ediliyor...');
 
     try {
-      await FirebaseService.setDoc('settings', 'daricaBoundary', {
-        coords:     closed,
-        updatedAt:  Date.now(),
-        pointCount: closed.length
+      const result = await Auth.requestMapChange('map_boundary', {
+        boundaryData: {
+          coords:     closed,
+          updatedAt:  Date.now(),
+          pointCount: closed.length
+        }
       });
-    } catch (e) {
-      console.error('[Map] Firebase boundary save failed:', e);
-      // Surface the real error message for easier debugging
-      const reason = e?.code
-        ? `(${e.code})`
-        : e?.message
-          ? e.message.substring(0, 80)
-          : 'Bilinmeyen hata';
-      _showToast(`Sınır kaydedilemedi: ${reason}`);
-      return;
-    }
 
-    _applyDaricaOverlay(closed);
-    if (_daricaBorder) {
-      try {
-        _map.fitBounds(_daricaBorder.getBounds(), { padding: [30, 30], maxZoom: 15 });
-      } catch {}
+      if (!result.success) {
+        _showToast(`Sınır kaydedilemedi: ${result.error}`);
+        return;
+      }
+
+      if (result.immediate) {
+        // Super admin — applied instantly, update overlay live
+        _applyDaricaOverlay(closed);
+        if (_daricaBorder) {
+          try { _map.fitBounds(_daricaBorder.getBounds(), { padding: [30, 30], maxZoom: 15 }); } catch {}
+        }
+        _showToast(`Darıca sınırı kaydedildi ✓ (${closed.length} nokta)`);
+      } else {
+        _showToast('Sınır değişikliği onay için üst yetkiliye gönderildi ✓');
+      }
+    } catch (e) {
+      console.error('[Map] Boundary request failed:', e);
+      _showToast(`Sınır kaydedilemedi: ${e?.message?.substring(0, 80) || 'Bilinmeyen hata'}`);
     }
-    _showToast(`Darıca sınırı kaydedildi ✓ (${closed.length} nokta)`);
   }
 
   function _loadMapPins() {
@@ -768,14 +771,35 @@
 
   window._delPin = async id => {
     if (!confirm('Bu konumu silmek istiyor musunuz?')) return;
+    let pinEventId = null;
     try {
-      // If this pin is linked to an event, delete the event too
       const pin = await FirebaseService.getDoc('mapPins', id);
-      if (pin?.eventId) {
-        await FirebaseService.deleteDoc('events', pin.eventId);
-      }
+      if (pin?.eventId) pinEventId = pin.eventId;
     } catch {}
-    await FirebaseService.deleteDoc('mapPins', id);
+
+    const pinTitle = (() => {
+      const marker = _pinMarkers[id];
+      // Try to extract title from the marker's popup content
+      try {
+        const popup = marker?.getPopup?.()?.getContent?.() || '';
+        const match = popup.match(/<b>(.*?)<\/b>/);
+        return match ? match[1] : id;
+      } catch { return id; }
+    })();
+
+    const result = await Auth.requestMapChange('map_pin_delete', {
+      pinId:      id,
+      pinEventId: pinEventId || null,
+      mapLabel:   `Konum silme: ${pinTitle}`
+    });
+
+    if (!result.success) { alert(result.error); return; }
+
+    if (result.immediate) {
+      _showToast('Konum silindi ✓');
+    } else {
+      _showToast('Konum silme talebi onay için üst yetkiliye gönderildi ✓');
+    }
   };
 
   window._openEventFromPin = async eventId => {
@@ -807,7 +831,7 @@
     if (!title) { alert('Başlık zorunludur.'); return; }
     if (!ll) { UI.closeMapPinModal(); return; }
     const btn = document.getElementById('save-pin-btn');
-    btn.disabled = true; btn.textContent = 'Kaydediliyor...';
+    btn.disabled = true; btn.textContent = 'Gönderiliyor...';
     const sched = UI.getPinSchedule();
     const pin = {
       id: CryptoManager.generateId(),
@@ -818,11 +842,19 @@
       createdAt: Date.now(), authorId: Auth.getUser()?.id
     };
     try {
-      await FirebaseService.setDoc('mapPins', pin.id, pin);
+      const result = await Auth.requestMapChange('map_pin_add', {
+        pinData:  pin,
+        mapLabel: `Konum ekleme: ${title}`
+      });
+      if (!result.success) { alert('Konum kaydedilemedi: ' + result.error); return; }
       UI.closeMapPinModal();
-      _showToast('Konum kaydedildi ✓');
+      if (result.immediate) {
+        _showToast('Konum kaydedildi ✓');
+      } else {
+        _showToast('Konum ekleme talebi onay için üst yetkiliye gönderildi ✓');
+      }
     } catch (e) {
-      console.error('[Map] Pin save failed:', e);
+      console.error('[Map] Pin request failed:', e);
       alert('Konum kaydedilemedi: ' + (e.message || 'Firebase bağlantısını kontrol edin.'));
     } finally {
       btn.disabled = false; btn.textContent = 'Kaydet';
@@ -861,7 +893,7 @@
         authorId:  Auth.getUser()?.id
       };
       await FirebaseService.setDoc('events', event.id, event);
-      // If triggered from map, also add/update a linked pin
+      // If triggered from map, also add/update a linked pin via approval workflow
       const eLat = parseFloat(modal.dataset.eventLat);
       const eLng = parseFloat(modal.dataset.eventLng);
       if (!isNaN(eLat) && !isNaN(eLng)) {
@@ -883,16 +915,30 @@
           authorId: Auth.getUser()?.id,
           eventId: event.id
         };
-        await FirebaseService.setDoc('mapPins', pin.id, pin);
+        const pinResult = await Auth.requestMapChange('map_pin_add', {
+          pinData:  pin,
+          mapLabel: `Etkinlik konumu: ${title}`
+        });
+        if (!pinResult.success) {
+          console.warn('[Map] Event-linked pin request failed:', pinResult.error);
+        } else if (!pinResult.immediate) {
+          _showToast('Harita konumu onay için üst yetkiliye gönderildi');
+        }
       } else if (editId) {
+        // Update title/desc on existing linked pin — these are metadata edits, not location changes,
+        // but to be consistent we route them through approval too
         try {
           const pins = await FirebaseService.getDocs('mapPins');
           const linked = pins.find(p => p.eventId === event.id);
           if (linked) {
-            await FirebaseService.setDoc('mapPins', linked.id, {
-              title,
-              desc: body ? body.substring(0, 60) : ''
+            const updatedPin = { ...linked, title, desc: body ? body.substring(0, 60) : '' };
+            const pinResult = await Auth.requestMapChange('map_pin_add', {
+              pinData:  updatedPin,
+              mapLabel: `Etkinlik konumu güncelleme: ${title}`
             });
+            if (!pinResult.success) {
+              console.warn('[Map] Event-linked pin update request failed:', pinResult.error);
+            }
           }
         } catch {}
       }
@@ -964,12 +1010,19 @@
             if (!confirm('Bu etkinliği silmek istiyor musunuz?')) return;
             const ev = docs.find(e => e.id === btn.dataset.id);
             await FirebaseService.deleteDoc('events', btn.dataset.id);
-            // Delete linked map pin by eventId (strong linkage)
+            // Delete linked map pin by eventId via approval workflow
             try {
               const pins = await FirebaseService.getDocs('mapPins');
               const relatedPin = pins.find(p => p.eventId === ev?.id);
               if (relatedPin) {
-                await FirebaseService.deleteDoc('mapPins', relatedPin.id);
+                const pinResult = await Auth.requestMapChange('map_pin_delete', {
+                  pinId:      relatedPin.id,
+                  pinEventId: null,  // event already deleted above
+                  mapLabel:   `Etkinlik konumu silme: ${ev?.title || relatedPin.title || ''}`
+                });
+                if (!pinResult.success) {
+                  console.warn('[Map] Event-linked pin delete request failed:', pinResult.error);
+                }
               }
             } catch {}
             await Notifications.sendToAll('Etkinlik İptal Edildi', ev?.title || '');
@@ -1403,9 +1456,39 @@
 
   document.getElementById('lib-settings-btn')?.addEventListener('click', () => UI.openSettings());
 
-  // View toggle
-  document.getElementById('lib-view-grid')?.addEventListener('click', () => Library.setViewMode('grid'));
-  document.getElementById('lib-view-list')?.addEventListener('click', () => Library.setViewMode('list'));
+  // View cycle toggle (single button: grid ↔ list)
+  document.getElementById('lib-view-cycle')?.addEventListener('click', () => Library.cycleViewMode());
+
+  // Sort button → open sort sheet
+  const _libSortBtn = document.getElementById('lib-sort-btn');
+  const _libSortModal = document.getElementById('modal-lib-sort');
+
+  function _openLibSort() {
+    if (!_libSortModal) return;
+    // Sync active state in the list
+    _libSortModal.querySelectorAll('.lib-sort-option').forEach(opt => {
+      opt.classList.toggle('lib-sort-option--active', opt.dataset.sort === Library.getSortMode());
+    });
+    _libSortModal.setAttribute('aria-hidden', 'false');
+    _libSortModal.classList.add('modal-overlay--open');
+  }
+
+  function _closeLibSort() {
+    _libSortModal?.setAttribute('aria-hidden', 'true');
+    _libSortModal?.classList.remove('modal-overlay--open');
+  }
+
+  _libSortBtn?.addEventListener('click', _openLibSort);
+  document.getElementById('close-lib-sort-btn')?.addEventListener('click', _closeLibSort);
+  _libSortModal?.addEventListener('click', (e) => { if (e.target === _libSortModal) _closeLibSort(); });
+
+  // Sort option selection
+  document.getElementById('lib-sort-options')?.addEventListener('click', (e) => {
+    const opt = e.target.closest('.lib-sort-option');
+    if (!opt) return;
+    Library.setSortMode(opt.dataset.sort);
+    _closeLibSort();
+  });
 
   // Search icon toggle
   const _libSearchBtn   = document.getElementById('lib-search-btn');
@@ -1665,6 +1748,31 @@ const OrgTree = (() => {
     hint.style.cssText = `position:absolute;bottom:10px;left:0;right:0`;
     hint.textContent = 'Profil detayları için karta dokunun';
     nodesDiv.appendChild(hint);
+
+    // ── Auto-center on root node ──────────────────────────
+    // After the DOM has painted, scroll the container so the root card
+    // is horizontally centered and sits near the top with a small gap.
+    requestAnimationFrame(() => {
+      const container = document.getElementById('orgtree-container');
+      if (!container || !root) return;
+
+      // root._x / root._y are set by _assignXY — use them directly
+      const rootCenterX = root._x + NODE_W / 2;
+      const rootTopY    = root._y;
+
+      const containerW = container.clientWidth;
+      const containerH = container.clientHeight;
+
+      // Scroll so the root card is centered horizontally and has ~40px top padding
+      const scrollLeft = rootCenterX - containerW / 2;
+      const scrollTop  = rootTopY - 40;
+
+      container.scrollTo({
+        left: Math.max(0, scrollLeft),
+        top:  Math.max(0, scrollTop),
+        behavior: 'instant'   // no animation — tree nodes already animate in
+      });
+    });
   }
 
   // ── Open profile modal ────────────────────────────────────

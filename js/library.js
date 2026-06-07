@@ -8,6 +8,7 @@ const Library = (() => {
   let _allBooks    = [];
   let _unsubscribe = null;
   let _viewMode    = 'grid'; // 'grid' | 'list'
+  let _sortMode    = 'default'; // 'default'|'views'|'downloads'|'newest'|'oldest'|'alpha-asc'|'alpha-desc'
   let _expandedBookId = null;
   let _searchQuery = '';
 
@@ -30,20 +31,32 @@ const Library = (() => {
         _updateViewToggle();
       }
     }).catch(() => {});
-    _updateViewToggle();
-  }
-
-  function _saveViewMode(mode) {
-    _viewMode = mode;
-    DB.setSetting('library_view_mode', mode).catch(() => {});
+    DB.getSetting('library_sort_mode', 'default').then(saved => {
+      const valid = ['default','views','downloads','newest','oldest','alpha-asc','alpha-desc'];
+      if (valid.includes(saved)) {
+        _sortMode = saved;
+        _updateSortBtn();
+      }
+    }).catch(() => {});
     _updateViewToggle();
   }
 
   function _updateViewToggle() {
-    const gridBtn = document.getElementById('lib-view-grid');
-    const listBtn = document.getElementById('lib-view-list');
-    gridBtn?.classList.toggle('lib-view-btn--active', _viewMode === 'grid');
-    listBtn?.classList.toggle('lib-view-btn--active', _viewMode === 'list');
+    const cycleBtn  = document.getElementById('lib-view-cycle');
+    const iconGrid  = document.getElementById('lib-view-icon-grid');
+    const iconList  = document.getElementById('lib-view-icon-list');
+    if (!cycleBtn) return;
+    cycleBtn.classList.add('lib-view-btn--active');
+    if (iconGrid) iconGrid.style.display = _viewMode === 'grid' ? '' : 'none';
+    if (iconList) iconList.style.display = _viewMode === 'list' ? '' : 'none';
+    cycleBtn.setAttribute('aria-label', _viewMode === 'grid' ? 'Liste görünümüne geç' : 'Izgara görünümüne geç');
+  }
+
+  function _updateSortBtn() {
+    const sortBtn = document.getElementById('lib-sort-btn');
+    if (!sortBtn) return;
+    // Highlight sort button when a non-default sort is active
+    sortBtn.classList.toggle('lib-view-btn--active', _sortMode !== 'default');
   }
 
   // ── Render book list ──────────────────────────────────────
@@ -57,13 +70,16 @@ const Library = (() => {
 
     // Apply search filter
     const q = _searchQuery.toLowerCase().trim();
-    const books = q
+    let books = q
       ? _allBooks.filter(b =>
           (b.title       || '').toLowerCase().includes(q) ||
           (b.author      || '').toLowerCase().includes(q) ||
           (b.description || '').toLowerCase().includes(q)
         )
-      : _allBooks;
+      : [..._allBooks];
+
+    // Apply sort
+    books = _applySortMode(books);
 
     if (books.length === 0) {
       gridEl.innerHTML = '';
@@ -514,11 +530,45 @@ const Library = (() => {
     } catch {}
   }
 
-  // ── View toggle ───────────────────────────────────────────
-  function setViewMode(mode) {
-    _saveViewMode(mode);
+  // ── View toggle (single cycle button) ────────────────────
+  function cycleViewMode() {
+    const next = _viewMode === 'grid' ? 'list' : 'grid';
+    _viewMode = next;
+    DB.setSetting('library_view_mode', next).catch(() => {});
+    _updateViewToggle();
     _render();
   }
+
+  // kept for back-compat but unused by new UI
+  function setViewMode(mode) {
+    _viewMode = mode;
+    DB.setSetting('library_view_mode', mode).catch(() => {});
+    _updateViewToggle();
+    _render();
+  }
+
+  // ── Sort ──────────────────────────────────────────────────
+  function _applySortMode(books) {
+    const arr = [...books];
+    switch (_sortMode) {
+      case 'views':      return arr.sort((a, b) => (b.viewCount     || 0) - (a.viewCount     || 0));
+      case 'downloads':  return arr.sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0));
+      case 'newest':     return arr.sort((a, b) => (b.order         || 0) - (a.order         || 0));
+      case 'oldest':     return arr.sort((a, b) => (a.order         || 0) - (b.order         || 0));
+      case 'alpha-asc':  return arr.sort((a, b) => (a.title || '').localeCompare(b.title || '', 'tr'));
+      case 'alpha-desc': return arr.sort((a, b) => (b.title || '').localeCompare(a.title || '', 'tr'));
+      default:           return arr; // 'default' → Firestore order (a.order asc)
+    }
+  }
+
+  function setSortMode(mode) {
+    _sortMode = mode;
+    DB.setSetting('library_sort_mode', mode).catch(() => {});
+    _updateSortBtn();
+    _render();
+  }
+
+  function getSortMode() { return _sortMode; }
 
   // ── Search ────────────────────────────────────────────────
   function search(query) {
@@ -532,7 +582,10 @@ const Library = (() => {
     load,
     destroy,
     search,
+    cycleViewMode,
     setViewMode,
+    setSortMode,
+    getSortMode,
     openBookForm: _openBookForm,
     closeBookForm: _closeBookForm,
     saveBookForm: _saveBookForm,
