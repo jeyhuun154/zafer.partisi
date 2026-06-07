@@ -1,0 +1,1142 @@
+/* ============================================================
+   Themes — CSS Custom Properties
+   3 themes: default (navy/white), dark, light (minimal)
+   ============================================================ */
+
+/* ── Default Theme (Navy + White + Light Grey) ─────────── */
+[data-theme="default"] {
+  --color-bg:               #F0F1F5;
+  --color-surface:          #FFFFFF;
+  --color-surface-elevated: #F0F1F5;
+  --color-surface-hover:    #E5E7EF;
+  --color-border:           #DDE0EA;
+  --color-primary:          #1B2E6E;
+  --color-primary-hover:    #152455;
+  --color-primary-subtle:   rgba(27,46,110,0.08);
+  --color-text:             #0F1824;
+  --color-text-secondary:   #5C657A;
+  --color-placeholder:      #AAB0C0;
+  --color-card-bg:          #FFFFFF;
+  --color-card-shadow:      rgba(27,46,110,0.08);
+  --color-offline-bg:       #1B2E6E;
+  --color-offline-text:     #FFFFFF;
+  --color-divider:          #EAECF0;
+
+  color-scheme: light;
+}
+
+/* ── Dark Theme ─────────────────────────────────────────── */
+[data-theme="dark"] {
+  --color-bg:               #0D0D0F;
+  --color-surface:          #1C1C1F;
+  --color-surface-elevated: #252528;
+  --color-surface-hover:    #2E2E32;
+  --color-border:           #38383C;
+  --color-primary:          #3D5CC7;
+  --color-primary-hover:    #4F6ED4;
+  --color-primary-subtle:   rgba(61,92,199,0.15);
+  --color-text:             #F2F2F7;
+  --color-text-secondary:   #8A8A96;
+  --color-placeholder:      #5A5A66;
+  --color-card-bg:          #1C1C1F;
+  --color-card-shadow:      rgba(0,0,0,0.4);
+  --color-offline-bg:       #3D5CC7;
+  --color-offline-text:     #FFFFFF;
+  --color-divider:          #2C2C30;
+
+  color-scheme: dark;
+}
+
+/* ── Light Theme (Clean / Minimal / "Vergi Dairesi") ────── */
+[data-theme="light"] {
+  --color-bg:               #FFFFFF;
+  --color-surface:          #F7F7F8;
+  --color-surface-elevated: #F0F0F2;
+  --color-surface-hover:    #E8E8EA;
+  --color-border:           #E0E0E4;
+  --color-primary:          #404040;
+  --color-primary-hover:    #282828;
+  --color-primary-subtle:   rgba(64,64,64,0.06);
+  --color-text:             #111111;
+  --color-text-secondary:   #777777;
+  --color-placeholder:      #BBBBBB;
+  --color-card-bg:          #FAFAFA;
+  --color-card-shadow:      rgba(0,0,0,0.06);
+  --color-offline-bg:       #333333;
+  --color-offline-text:     #FFFFFF;
+  --color-divider:          #EBEBEB;
+
+  color-scheme: light;
+}
+
+/* ── Theme-aware scrollbar ──────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+/* ── Selection color ────────────────────────────────────── */
+::selection {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+}
+
+/* ============================================================
+   Glassmorphism — Apple Liquid Glass UI
+   Active when [data-wallpaper] is set on <html>
+   Inspired by iOS 26 / macOS Tahoe Liquid Glass aesthetic.
+   ============================================================ */
+
+/* ── Glass variables — default/dark wallpaper ──────────── */
+html[data-wallpaper] {
+  /* Surfaces — frosted, never fully transparent */
+  --glass-bg:              rgba(28, 28, 32, 0.52);
+  --glass-bg-heavy:        rgba(22, 22, 26, 0.72);
+  --glass-bg-card:         rgba(38, 38, 44, 0.58);
+  --glass-bg-input:        rgba(255,255,255,0.10);
+  --glass-bg-btn:          rgba(255,255,255,0.16);
+  --glass-bg-row:          rgba(255,255,255,0.09);
+  --glass-bg-row-hover:    rgba(255,255,255,0.15);
+
+  /* Borders — subtle light edge highlight */
+  --glass-border:          rgba(255,255,255,0.22);
+  --glass-border-soft:     rgba(255,255,255,0.12);
+  --glass-border-inner:    rgba(255,255,255,0.30); /* top/left inner highlight */
+
+  /* Shadows — layered depth */
+  --glass-shadow:
+    0 2px 0 rgba(255,255,255,0.12) inset,
+    0 -1px 0 rgba(0,0,0,0.20) inset,
+    0 12px 40px rgba(0,0,0,0.40),
+    0 4px 12px rgba(0,0,0,0.25);
+  --glass-shadow-sm:
+    0 1px 0 rgba(255,255,255,0.10) inset,
+    0 6px 20px rgba(0,0,0,0.32),
+    0 2px 6px rgba(0,0,0,0.18);
+  --glass-shadow-card:
+    0 1px 0 rgba(255,255,255,0.09) inset,
+    0 4px 16px rgba(0,0,0,0.28),
+    0 1px 4px rgba(0,0,0,0.15);
+
+  /* Text */
+  --glass-text:            rgba(255,255,255,0.96);
+  --glass-text-muted:      rgba(255,255,255,0.60);
+  --glass-text-placeholder:rgba(255,255,255,0.38);
+
+  /* Blur levels */
+  --glass-blur:            saturate(160%) blur(22px);
+  --glass-blur-heavy:      saturate(180%) blur(40px);
+  --glass-blur-header:     saturate(150%) blur(18px);
+  --glass-blur-input:      blur(12px);
+
+  /* Scrim behind modals */
+  --glass-scrim:           rgba(0,0,0,0.38);
+}
+
+/* ── Light theme override — brighter frosted glass ─────── */
+html[data-wallpaper][data-theme="light"] {
+  --glass-bg:              rgba(255,255,255,0.48);
+  --glass-bg-heavy:        rgba(255,255,255,0.68);
+  --glass-bg-card:         rgba(255,255,255,0.52);
+  --glass-bg-input:        rgba(255,255,255,0.62);
+  --glass-bg-btn:          rgba(255,255,255,0.58);
+  --glass-bg-row:          rgba(255,255,255,0.38);
+  --glass-bg-row-hover:    rgba(255,255,255,0.55);
+
+  --glass-border:          rgba(255,255,255,0.75);
+  --glass-border-soft:     rgba(255,255,255,0.45);
+  --glass-border-inner:    rgba(255,255,255,0.90);
+
+  --glass-shadow:
+    0 2px 0 rgba(255,255,255,0.80) inset,
+    0 -1px 0 rgba(0,0,0,0.06) inset,
+    0 12px 40px rgba(0,0,0,0.14),
+    0 4px 12px rgba(0,0,0,0.08);
+  --glass-shadow-sm:
+    0 1px 0 rgba(255,255,255,0.75) inset,
+    0 6px 20px rgba(0,0,0,0.10),
+    0 2px 6px rgba(0,0,0,0.06);
+  --glass-shadow-card:
+    0 1px 0 rgba(255,255,255,0.70) inset,
+    0 4px 16px rgba(0,0,0,0.10),
+    0 1px 4px rgba(0,0,0,0.05);
+
+  --glass-text:            rgba(0,0,0,0.90);
+  --glass-text-muted:      rgba(0,0,0,0.54);
+  --glass-text-placeholder:rgba(0,0,0,0.30);
+  --glass-scrim:           rgba(0,0,0,0.22);
+}
+
+/* ── Default (navy) theme override — tinted navy glass ─── */
+html[data-wallpaper][data-theme="default"] {
+  --glass-bg:              rgba(18, 26, 56, 0.50);
+  --glass-bg-heavy:        rgba(14, 20, 46, 0.72);
+  --glass-bg-card:         rgba(24, 34, 68, 0.56);
+  --glass-bg-input:        rgba(255,255,255,0.10);
+  --glass-bg-btn:          rgba(255,255,255,0.15);
+  --glass-bg-row:          rgba(255,255,255,0.08);
+  --glass-bg-row-hover:    rgba(255,255,255,0.14);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Wallpaper background layer
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  z-index: -1;
+  background-image: var(--wallpaper-url);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Make transparent so wallpaper shows through */
+html[data-wallpaper] .app-shell,
+html[data-wallpaper] body {
+  background: transparent !important;
+}
+
+html[data-wallpaper] .screen {
+  background: transparent !important;
+}
+
+/* Splash stays opaque */
+html[data-wallpaper] #screen-splash {
+  background: #1B2E6E !important;
+  z-index: 9998 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Modal overlay scrim
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .modal-overlay {
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+  background: var(--glass-scrim) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Modal sheets — frosted bottom sheets
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .modal-sheet {
+  background: var(--glass-bg-heavy) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-bottom: none !important;
+  box-shadow: var(--glass-shadow) !important;
+  color: var(--glass-text) !important;
+}
+
+/* Drag handle */
+html[data-wallpaper] .modal-sheet__handle {
+  background: rgba(255,255,255,0.30) !important;
+}
+
+/* Sheet titles */
+html[data-wallpaper] .modal-sheet__title {
+  color: var(--glass-text) !important;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+}
+
+/* All text inside sheets */
+html[data-wallpaper] .modal-sheet .form-label,
+html[data-wallpaper] .modal-sheet .settings-section__label,
+html[data-wallpaper] .modal-sheet p,
+html[data-wallpaper] .modal-sheet label,
+html[data-wallpaper] .modal-sheet span {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .modal-sheet h3,
+html[data-wallpaper] .modal-sheet h4,
+html[data-wallpaper] .modal-sheet strong {
+  color: var(--glass-text) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Navigation header — frosted bar
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .app-header {
+  background: var(--glass-bg-heavy) !important;
+  backdrop-filter: var(--glass-blur-header) !important;
+  -webkit-backdrop-filter: var(--glass-blur-header) !important;
+  border-bottom: 1px solid var(--glass-border-soft) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 1px 12px rgba(0,0,0,0.18) !important;
+}
+
+html[data-wallpaper] .app-header__title {
+  color: var(--glass-text) !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.28);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Icon buttons — glass pills
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .icon-btn {
+  background: var(--glass-bg-btn) !important;
+  backdrop-filter: var(--glass-blur-input) !important;
+  -webkit-backdrop-filter: var(--glass-blur-input) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: var(--glass-text) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.14) inset, 0 2px 8px rgba(0,0,0,0.20) !important;
+}
+
+html[data-wallpaper] .icon-btn:hover {
+  background: rgba(255,255,255,0.24) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Buttons — glass pill buttons
+   ══════════════════════════════════════════════════════════ */
+
+/* Ghost / outline buttons get glass treatment */
+html[data-wallpaper] .btn--ghost,
+html[data-wallpaper] .btn--outline {
+  background: var(--glass-bg-btn) !important;
+  backdrop-filter: var(--glass-blur-input) !important;
+  -webkit-backdrop-filter: var(--glass-blur-input) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--glass-text) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 2px 8px rgba(0,0,0,0.18) !important;
+}
+
+/* Primary buttons stay opaque but get subtle glass highlight */
+html[data-wallpaper] .btn--primary {
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.18) inset,
+    0 6px 20px rgba(27,46,110,0.45) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Home tiles — frosted glass cards
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .home-tile {
+  background: var(--glass-bg-card) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  box-shadow: var(--glass-shadow-card) !important;
+}
+
+html[data-wallpaper] .home-tile:active {
+  background: rgba(255,255,255,0.22) !important;
+}
+
+html[data-wallpaper] .home-tile__label {
+  color: var(--glass-text) !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.30);
+}
+
+html[data-wallpaper] .home-tile__icon {
+  background: rgba(255,255,255,0.12) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+}
+
+html[data-wallpaper] .home-tile__icon svg {
+  stroke: var(--glass-text) !important;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
+}
+
+/* Social bar links */
+html[data-wallpaper] .home-social-link {
+  background: var(--glass-bg-card) !important;
+  backdrop-filter: var(--glass-blur-input) !important;
+  -webkit-backdrop-filter: var(--glass-blur-input) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  box-shadow: var(--glass-shadow-sm) !important;
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .home-social-link--party {
+  background: rgba(255,255,255,0.22) !important;
+  border-color: rgba(255,255,255,0.40) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   People / Event cards
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .people-card {
+  background: var(--glass-bg-card) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  box-shadow: var(--glass-shadow-card) !important;
+}
+
+html[data-wallpaper] .people-card__name {
+  color: var(--glass-text) !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.28);
+}
+
+html[data-wallpaper] .people-card__desc {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .event-card {
+  background: var(--glass-bg-card) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  box-shadow: var(--glass-shadow-card) !important;
+}
+
+html[data-wallpaper] .event-card__title {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .event-card__body {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .event-card__date {
+  background: rgba(255,255,255,0.14) !important;
+  color: var(--glass-text) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Form inputs — frosted glass fields
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .form-input {
+  background: var(--glass-bg-input) !important;
+  backdrop-filter: var(--glass-blur-input) !important;
+  -webkit-backdrop-filter: var(--glass-blur-input) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  color: var(--glass-text) !important;
+  -webkit-text-fill-color: var(--glass-text);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 2px 8px rgba(0,0,0,0.16) !important;
+}
+
+html[data-wallpaper] .form-input:focus {
+  background: rgba(255,255,255,0.16) !important;
+  border-color: rgba(255,255,255,0.42) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.12) inset,
+    0 0 0 3px rgba(255,255,255,0.12),
+    0 2px 8px rgba(0,0,0,0.18) !important;
+}
+
+html[data-wallpaper][data-theme="light"] .form-input {
+  background: rgba(255,255,255,0.68) !important;
+  border-color: rgba(255,255,255,0.80) !important;
+  color: rgba(0,0,0,0.88) !important;
+  -webkit-text-fill-color: rgba(0,0,0,0.88);
+}
+
+html[data-wallpaper][data-theme="light"] .form-input:focus {
+  background: rgba(255,255,255,0.82) !important;
+  border-color: rgba(255,255,255,0.92) !important;
+}
+
+html[data-wallpaper] .form-input::placeholder {
+  color: var(--glass-text-placeholder) !important;
+}
+
+html[data-wallpaper] .form-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px rgba(40,40,50,0.8) inset !important;
+  -webkit-text-fill-color: var(--glass-text) !important;
+}
+
+/* Textarea */
+html[data-wallpaper] .form-textarea {
+  background: var(--glass-bg-input) !important;
+  border-color: var(--glass-border-soft) !important;
+  color: var(--glass-text) !important;
+  -webkit-text-fill-color: var(--glass-text);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Settings rows
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .settings-row-btn {
+  background: var(--glass-bg-row) !important;
+  backdrop-filter: var(--glass-blur-input) !important;
+  -webkit-backdrop-filter: var(--glass-blur-input) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  color: var(--glass-text) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset !important;
+}
+
+html[data-wallpaper] .settings-row-btn:hover {
+  background: var(--glass-bg-row-hover) !important;
+}
+
+html[data-wallpaper] .settings-row-btn svg {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .settings-section__label {
+  color: rgba(255,255,255,0.45) !important;
+}
+
+html[data-wallpaper] .settings-divider {
+  background: rgba(255,255,255,0.10) !important;
+}
+
+/* Theme picker rows inside settings glass sheet */
+html[data-wallpaper] .theme-options {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 14px !important;
+}
+
+html[data-wallpaper] .theme-option {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .theme-option:hover {
+  background: rgba(255,255,255,0.12) !important;
+}
+
+html[data-wallpaper] .theme-option.active {
+  background: rgba(255,255,255,0.18) !important;
+}
+
+html[data-wallpaper] .theme-option__check {
+  color: var(--glass-text) !important;
+}
+
+/* Notify row */
+html[data-wallpaper] .settings-notify-row {
+  background: var(--glass-bg-row) !important;
+  backdrop-filter: var(--glass-blur-input) !important;
+  -webkit-backdrop-filter: var(--glass-blur-input) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .settings-notify-row:hover {
+  background: var(--glass-bg-row-hover) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Login card
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .login__form-card {
+  background: var(--glass-bg-heavy) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 28px !important;
+  padding: 28px 24px !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+html[data-wallpaper] .login__title {
+  color: var(--glass-text) !important;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.30);
+}
+
+html[data-wallpaper] .login__subtitle {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .login__register-link {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .login__register-link-btn {
+  color: rgba(255,255,255,0.88) !important;
+}
+
+/* KVKK box inside login */
+html[data-wallpaper] .kvkk-scroll-box {
+  background: rgba(255,255,255,0.07) !important;
+  border-color: rgba(255,255,255,0.16) !important;
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .kvkk-label-text {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .kvkk-checkmark {
+  background: rgba(255,255,255,0.10) !important;
+  border-color: rgba(255,255,255,0.28) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Search bar
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .search-bar__input {
+  background: var(--glass-bg-input) !important;
+  backdrop-filter: var(--glass-blur-input) !important;
+  -webkit-backdrop-filter: var(--glass-blur-input) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  color: var(--glass-text) !important;
+  -webkit-text-fill-color: var(--glass-text);
+}
+
+html[data-wallpaper] .search-bar__input::placeholder {
+  color: var(--glass-text-placeholder) !important;
+}
+
+html[data-wallpaper] .search-bar__input:focus {
+  border-color: rgba(255,255,255,0.35) !important;
+  background: rgba(255,255,255,0.15) !important;
+}
+
+html[data-wallpaper] .search-bar__icon {
+  color: var(--glass-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Toast notification
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] #app-toast {
+  background: rgba(30, 30, 36, 0.78) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  color: var(--glass-text) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 8px 24px rgba(0,0,0,0.36) !important;
+}
+
+html[data-wallpaper][data-theme="light"] #app-toast {
+  background: rgba(255,255,255,0.80) !important;
+  color: rgba(0,0,0,0.88) !important;
+  border-color: rgba(255,255,255,0.90) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Offline banner
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .offline-banner__inner {
+  background: rgba(0,0,0,0.60) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Pagination bar
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .pagination {
+  background: var(--glass-bg-heavy) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border-top: 1px solid var(--glass-border-soft) !important;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.20) !important;
+}
+
+html[data-wallpaper] .pagination__btn {
+  background: var(--glass-bg-btn) !important;
+  border-color: var(--glass-border-soft) !important;
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .pagination__indicator {
+  color: var(--glass-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Home footer
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .home-footer {
+  color: rgba(255,255,255,0.38) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Org Tree nodes
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .otree-node__card {
+  background: var(--glass-bg-card) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border-color: var(--glass-border-soft) !important;
+  box-shadow: var(--glass-shadow-card) !important;
+}
+
+html[data-wallpaper] .otree-node--root .otree-node__card {
+  border-color: rgba(255,255,255,0.35) !important;
+  box-shadow: var(--glass-shadow-card), 0 0 0 3px rgba(255,255,255,0.10) !important;
+}
+
+html[data-wallpaper] .otree-node__name {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .otree-node__title-badge {
+  background: rgba(255,255,255,0.14) !important;
+  color: var(--glass-text) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+
+html[data-wallpaper] .otree-node__initials {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] #orgtree-container {
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 70%, rgba(255,255,255,0.04) 0%, transparent 55%),
+    transparent !important;
+}
+
+html[data-wallpaper] .orgtree-hint {
+  color: rgba(255,255,255,0.38) !important;
+}
+
+html[data-wallpaper] .otree-connector {
+  stroke: rgba(255,255,255,0.20) !important;
+}
+
+html[data-wallpaper] .otree-edit-row {
+  background: var(--glass-bg-row) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+}
+
+html[data-wallpaper] .otree-edit-row__name {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .otree-edit-row__role {
+  color: var(--glass-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   User rows inside modals
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .user-row {
+  background: var(--glass-bg-row) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+}
+
+html[data-wallpaper] .user-row__name {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .user-row__badge {
+  background: rgba(255,255,255,0.14) !important;
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .add-user-form {
+  background: var(--glass-bg-row) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  border-radius: 14px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Notification center
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] #modal-notif-center .modal-sheet {
+  background: var(--glass-bg-heavy) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-bottom: none !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+html[data-wallpaper] .notif-item {
+  background: var(--glass-bg-row) !important;
+  border: 1px solid var(--glass-border-soft) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+html[data-wallpaper] .notif-item--action {
+  background: rgba(255,255,255,0.14) !important;
+  border-color: rgba(255,255,255,0.24) !important;
+}
+
+html[data-wallpaper] .notif-item--new {
+  background: rgba(255,255,255,0.15) !important;
+  border-color: rgba(255,255,255,0.28) !important;
+}
+
+html[data-wallpaper] .notif-item__title  { color: var(--glass-text) !important; }
+html[data-wallpaper] .notif-item__desc,
+html[data-wallpaper] .notif-item__meta   { color: var(--glass-text-muted) !important; }
+
+html[data-wallpaper] .notif-item__icon {
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+
+html[data-wallpaper] .notif-section-label {
+  color: rgba(255,255,255,0.42) !important;
+}
+
+/* Approve/reject buttons in glass mode */
+html[data-wallpaper] .notif-action-btn--reject {
+  background: rgba(255,255,255,0.12) !important;
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .notif-empty {
+  color: var(--glass-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   See-more modal content
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .see-more__name {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .see-more__desc {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .see-more__notes-section {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 12px !important;
+}
+
+html[data-wallpaper] .see-more__notes-text {
+  color: var(--glass-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Event detail inside modal
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .event-detail__date {
+  color: rgba(255,255,255,0.75) !important;
+}
+
+html[data-wallpaper] .event-detail__body {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .event-detail__links a {
+  background: rgba(255,255,255,0.10) !important;
+  color: var(--glass-text) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+}
+
+html[data-wallpaper] .event-detail__links a:hover {
+  background: rgba(255,255,255,0.22) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Photo upload circle & social inputs
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .photo-upload__circle {
+  background: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.20) !important;
+}
+
+html[data-wallpaper] .social-input-icon {
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+}
+
+html[data-wallpaper] .modal-person-footer {
+  border-color: rgba(255,255,255,0.12) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Pin icon picker
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .pin-icon-option {
+  background: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.14) !important;
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .pin-icon-option .label {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .pin-icon-option.selected {
+  background: rgba(255,255,255,0.22) !important;
+  border-color: rgba(255,255,255,0.50) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Card action buttons (edit/delete on people cards)
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .card-action-btn {
+  background: rgba(0,0,0,0.30) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .card-see-more-btn {
+  background: rgba(0,0,0,0.28) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  color: var(--glass-text) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Welcome popup modal
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .modal-welcome__title {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .modal-welcome__desc {
+  color: var(--glass-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   User detail fields
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .user-detail__field {
+  border-color: rgba(255,255,255,0.10) !important;
+}
+
+html[data-wallpaper] .user-detail__label {
+  color: rgba(255,255,255,0.42) !important;
+}
+
+html[data-wallpaper] .user-detail__value {
+  color: var(--glass-text) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FAB buttons (events add, etc.)
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .events-fab {
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.18) inset,
+    0 8px 28px rgba(27,46,110,0.55),
+    0 2px 8px rgba(0,0,0,0.30) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Orgtree profile modal specifics
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .orgtree-profile__name {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .orgtree-profile__title {
+  background: rgba(255,255,255,0.14) !important;
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] .orgtree-profile__bio {
+  color: var(--glass-text-muted) !important;
+}
+
+html[data-wallpaper] .orgtree-profile__photo-wrap {
+  border-color: rgba(255,255,255,0.30) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   People photo placeholder
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .people-card__photo-placeholder {
+  background: rgba(255,255,255,0.14) !important;
+  color: var(--glass-text) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Leaflet popup glass
+   ══════════════════════════════════════════════════════════ */
+html[data-wallpaper] .leaflet-popup-content-wrapper {
+  background: rgba(22, 22, 28, 0.78) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  box-shadow: var(--glass-shadow) !important;
+  color: var(--glass-text) !important;
+  border-radius: 16px !important;
+}
+
+html[data-wallpaper] .leaflet-popup-tip {
+  background: rgba(22, 22, 28, 0.78) !important;
+}
+
+html[data-wallpaper] .leaflet-popup-content {
+  color: var(--glass-text) !important;
+}
+
+html[data-wallpaper][data-theme="light"] .leaflet-popup-content-wrapper {
+  background: rgba(255,255,255,0.80) !important;
+  color: rgba(0,0,0,0.88) !important;
+}
+
+html[data-wallpaper][data-theme="light"] .leaflet-popup-tip {
+  background: rgba(255,255,255,0.80) !important;
+}
+
+/* ── Wallpaper Picker (inside settings) ────────────────── */
+.wallpaper-section {
+  margin-bottom: 6px;
+}
+
+.wallpaper-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  /* Hide scrollbar visually but keep functionality */
+  scrollbar-width: none;
+}
+
+.wallpaper-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.wallpaper-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 72px;
+  height: 108px; /* 2:3 aspect ratio, fixed */
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2.5px solid transparent;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+  background: var(--color-surface-elevated);
+}
+
+.wallpaper-thumb:active { transform: scale(0.95); }
+
+.wallpaper-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wallpaper-thumb--none {
+  background: linear-gradient(135deg, var(--color-surface-elevated) 0%, var(--color-border) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wallpaper-thumb--none svg {
+  width: 22px;
+  height: 22px;
+  opacity: 0.45;
+}
+
+.wallpaper-thumb--none span {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.03em;
+}
+
+.wallpaper-thumb--active {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 1px var(--color-primary), 0 4px 16px rgba(0,0,0,0.2);
+}
+
+html[data-wallpaper] .wallpaper-thumb--active {
+  border-color: rgba(255,255,255,0.9) !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.9), 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.wallpaper-thumb__check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html[data-wallpaper] .wallpaper-thumb__check {
+  background: white;
+}
+
+html[data-wallpaper] .wallpaper-thumb__check svg {
+  color: var(--color-primary) !important;
+}
+
+.wallpaper-thumb--active .wallpaper-thumb__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.wallpaper-thumb__check svg {
+  width: 12px;
+  height: 12px;
+  color: white;
+}
+
+/* Admin wallpaper upload row */
+.wallpaper-admin-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.wallpaper-admin-row .form-input { flex: 1; font-size: 13px; padding: 10px 12px; }
+
+.wallpaper-add-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+html[data-wallpaper] .wallpaper-add-btn {
+  background: rgba(255,255,255,0.2) !important;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+  backdrop-filter: blur(8px);
+}
+
+.wallpaper-add-btn:active { transform: scale(0.92); }
+.wallpaper-add-btn svg { width: 18px; height: 18px; }
+
+.wallpaper-del-btn {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,59,48,0.85);
+  backdrop-filter: blur(6px);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.wallpaper-thumb:hover .wallpaper-del-btn,
+.wallpaper-thumb:focus-within .wallpaper-del-btn {
+  opacity: 1;
+  pointer-events: all;
+}
