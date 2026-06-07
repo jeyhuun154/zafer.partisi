@@ -505,14 +505,26 @@
   let _daricaOverlay = null;
   let _daricaBorder  = null;
 
+  // Normalise a coords array that may contain either [lat,lng] arrays
+  // (legacy APP_CONFIG format) or {lat,lng} objects (Firestore format).
+  function _normaliseBoundary(coords) {
+    if (!Array.isArray(coords) || !coords.length) return [];
+    return coords.map(p => {
+      if (Array.isArray(p)) return p;                  // already [lat, lng]
+      if (p && typeof p.lat === 'number') return [p.lat, p.lng]; // {lat,lng} obj
+      return null;
+    }).filter(p => p && isFinite(p[0]) && isFinite(p[1]));
+  }
+
   async function _loadDaricaOverlay() {
     let boundary = APP_CONFIG?.daricaBoundary || [];
     try {
       const saved = await FirebaseService.getDoc('settings', 'daricaBoundary');
       if (saved?.coords?.length >= 3) boundary = saved.coords;
     } catch {}
-    if (boundary.length >= 3) {
-      _applyDaricaOverlay(boundary);
+    const normalised = _normaliseBoundary(boundary);
+    if (normalised.length >= 3) {
+      _applyDaricaOverlay(normalised);
       try {
         if (_daricaBorder) {
           _map.fitBounds(_daricaBorder.getBounds(), { padding: [30, 30], maxZoom: 15 });
@@ -522,7 +534,10 @@
   }
 
   function _applyDaricaOverlay(boundary) {
-    if (!_map || !boundary?.length) return;
+    // Accept either raw array or un-normalised — always normalise defensively
+    const pts = (boundary.length && Array.isArray(boundary[0])) ? boundary : _normaliseBoundary(boundary);
+    if (!_map || !pts?.length) return;
+    boundary = pts;
     _daricaOverlay?.remove();
     _daricaBorder?.remove();
 
@@ -663,19 +678,30 @@
       simplified = simplified.filter((_, i) => i % step === 0);
     }
 
-    // Round coords to 6 decimal places to shrink payload
-    const rounded = simplified.map(([lat, lng]) => [
-      Math.round(lat * 1e6) / 1e6,
-      Math.round(lng * 1e6) / 1e6
-    ]);
-    const closed = [...rounded, rounded[0]];
+    // Filter out NaN/Infinity that cause Firestore invalid-argument
+    const validPoints = simplified.filter(([lat, lng]) =>
+      isFinite(lat) && isFinite(lng) && !isNaN(lat) && !isNaN(lng)
+    );
+    if (validPoints.length < 3) {
+      _showToast('Geçerli nokta sayısı yetersiz. Tekrar çizin.');
+      return;
+    }
+
+    // CRITICAL: Firestore does NOT support nested arrays ([[lat,lng],...])
+    // Must convert to plain objects {lat, lng} to avoid invalid-argument error.
+    const rounded = validPoints.map(([lat, lng]) => ({
+      lat: Math.round(lat * 1e6) / 1e6,
+      lng: Math.round(lng * 1e6) / 1e6
+    }));
+    // Close the polygon by repeating first point as a fresh object
+    const closed = [...rounded, { lat: rounded[0].lat, lng: rounded[0].lng }];
 
     _showToast('Sınır kaydediliyor...');
 
     try {
       await FirebaseService.setDoc('settings', 'daricaBoundary', {
-        coords:    closed,
-        updatedAt: Date.now(),
+        coords:     closed,
+        updatedAt:  Date.now(),
         pointCount: closed.length
       });
     } catch (e) {
