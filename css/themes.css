@@ -350,18 +350,10 @@ html[data-wallpaper] .home-tile__icon svg {
   filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
 }
 
-/* Social bar — give the container itself a glass backdrop so the
-   raw wallpaper never shows through the gaps between icon buttons */
+/* Social bar — no container background; individual icon buttons already
+   receive glass treatment via the .home-social-link rule below.
+   Only keep isolation to prevent the home logo shadow from bleeding up. */
 html[data-wallpaper] .home-social-bar {
-  background: var(--glass-bg-heavy) !important;
-  backdrop-filter: var(--glass-blur-header) !important;
-  -webkit-backdrop-filter: var(--glass-blur-header) !important;
-  border-radius: 0 0 16px 0;
-  /* Extend to fill the full header height flush with app-header */
-  height: 56px !important;
-  padding: 0 8px !important;
-  margin: 0 !important;
-  /* Prevent shadow/paint from the home logo below from bleeding up */
   isolation: isolate;
 }
 

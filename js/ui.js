@@ -1040,123 +1040,86 @@ const UIExtended = {
         </div>`;
       gallery.querySelector('img')?.addEventListener('click', () => UI.openLightbox(photos[0]));
     } else {
-      // Multi-image swipeable carousel
-      let _carouselIdx = 0;
-      const total = photos.length;
+      // Multi-image: square thumbnail grid, up to 3 visible, drag-scroll for more
+      const THUMB_SIZE  = 110; // px — square thumb width/height
+      const THUMB_GAP   = 6;   // px gap between thumbs
+      const needsScroll = photos.length > 3;
 
-      gallery.style.cssText = 'margin:0 0 16px;border-radius:14px;overflow:hidden;position:relative;user-select:none;';
+      gallery.style.cssText = 'margin:0 0 16px;position:relative;';
+
       gallery.innerHTML = `
-        <div class="ev-carousel__track-wrap" style="overflow:hidden;position:relative;height:200px;">
-          <div class="ev-carousel__track"
-            style="display:flex;height:100%;transition:transform 0.32s cubic-bezier(0.25,0.46,0.45,0.94);will-change:transform;">
-            ${photos.map((url, idx) => `
-              <div style="flex-shrink:0;width:100%;height:200px;position:relative;">
-                <img src="${UI._escHtml(url)}" alt="" data-lightbox-url="${UI._escHtml(url)}" data-idx="${idx}"
-                  style="width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;background:var(--color-surface-elevated)">
-                ${Auth.isAdmin() ? `<button class="event-photo-del-btn" data-idx="${idx}" aria-label="Fotoğrafı sil"
-                  style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:8px;border:none;
-                         background:rgba(255,59,48,0.85);color:white;cursor:pointer;display:flex;
-                         align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
-                </button>` : ''}
-              </div>`).join('')}
-          </div>
-        </div>
-        <!-- Prev / Next arrows -->
-        <button class="ev-carousel__arrow ev-carousel__arrow--prev" aria-label="Önceki"
-          style="position:absolute;top:50%;left:8px;transform:translateY(-50%);
-                 width:32px;height:32px;border-radius:50%;border:none;
-                 background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);
-                 color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <button class="ev-carousel__arrow ev-carousel__arrow--next" aria-label="Sonraki"
-          style="position:absolute;top:50%;right:8px;transform:translateY(-50%);
-                 width:32px;height:32px;border-radius:50%;border:none;
-                 background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);
-                 color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <!-- Dot indicators -->
-        <div class="ev-carousel__dots"
-          style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
-                 display:flex;gap:5px;z-index:4;">
-          ${photos.map((_, i) => `<div class="ev-carousel__dot${i === 0 ? ' ev-carousel__dot--active' : ''}" data-i="${i}"
-            style="width:6px;height:6px;border-radius:50%;background:${i === 0 ? 'white' : 'rgba(255,255,255,0.45)'};
-                   transition:background 0.2s,transform 0.2s;cursor:pointer;
-                   ${i === 0 ? 'transform:scale(1.3)' : ''}"></div>`).join('')}
+        <div class="ev-thumb-strip"
+          style="display:flex;gap:${THUMB_GAP}px;
+                 overflow-x:${needsScroll ? 'auto' : 'hidden'};
+                 overflow-y:hidden;
+                 scroll-snap-type:x mandatory;
+                 -webkit-overflow-scrolling:touch;
+                 scrollbar-width:none;
+                 padding-bottom:2px;
+                 cursor:${needsScroll ? 'grab' : 'default'};
+                 user-select:none;">
+          ${photos.map((url, idx) => `
+            <div class="ev-thumb-item"
+              style="flex-shrink:0;
+                     width:${THUMB_SIZE}px;height:${THUMB_SIZE}px;
+                     border-radius:10px;overflow:hidden;
+                     position:relative;
+                     scroll-snap-align:start;
+                     background:var(--color-surface-elevated);">
+              <img src="${UI._escHtml(url)}" alt="" data-lightbox-url="${UI._escHtml(url)}" data-idx="${idx}"
+                style="width:100%;height:100%;object-fit:cover;display:block;
+                       cursor:pointer;pointer-events:auto;
+                       -webkit-user-drag:none;user-drag:none;">
+              ${Auth.isAdmin() ? `<button class="event-photo-del-btn" data-idx="${idx}" aria-label="Fotoğrafı sil"
+                style="position:absolute;top:5px;right:5px;width:24px;height:24px;
+                       border-radius:7px;border:none;
+                       background:rgba(255,59,48,0.88);color:white;cursor:pointer;
+                       display:flex;align-items:center;justify-content:center;
+                       backdrop-filter:blur(4px);z-index:3;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>` : ''}
+            </div>`).join('')}
         </div>`;
 
-      const track    = gallery.querySelector('.ev-carousel__track');
-      const dots     = gallery.querySelectorAll('.ev-carousel__dot');
-      const prevBtn  = gallery.querySelector('.ev-carousel__arrow--prev');
-      const nextBtn  = gallery.querySelector('.ev-carousel__arrow--next');
-      const trackWrap = gallery.querySelector('.ev-carousel__track-wrap');
+      // Hide scrollbar on WebKit
+      const styleTag = document.createElement('style');
+      styleTag.textContent = '.ev-thumb-strip::-webkit-scrollbar{display:none}';
+      gallery.appendChild(styleTag);
 
-      function _goTo(idx) {
-        _carouselIdx = (idx + total) % total;
-        track.style.transform = `translateX(-${_carouselIdx * 100}%)`;
-        dots.forEach((d, i) => {
-          const active = i === _carouselIdx;
-          d.style.background = active ? 'white' : 'rgba(255,255,255,0.45)';
-          d.style.transform  = active ? 'scale(1.3)' : 'scale(1)';
-        });
-        // Show/hide arrows at boundaries (optional — loop is fine too; keep both visible)
-      }
+      const strip = gallery.querySelector('.ev-thumb-strip');
 
-      prevBtn.addEventListener('click', e => { e.stopPropagation(); _goTo(_carouselIdx - 1); });
-      nextBtn.addEventListener('click', e => { e.stopPropagation(); _goTo(_carouselIdx + 1); });
-      dots.forEach(d => d.addEventListener('click', e => { e.stopPropagation(); _goTo(parseInt(d.dataset.i)); }));
+      // ── Lightbox on tap (guard against drag) ──────────────
+      let _pointerMoved = false;
+      strip.addEventListener('pointerdown', () => { _pointerMoved = false; }, { passive: true });
+      strip.addEventListener('pointermove', () => { _pointerMoved = true;  }, { passive: true });
 
-      // Lightbox on image tap (only if not a drag)
       gallery.querySelectorAll('img[data-lightbox-url]').forEach(img => {
-        img.addEventListener('click', () => UI.openLightbox(img.dataset.lightboxUrl));
+        img.addEventListener('click', (e) => {
+          if (_pointerMoved) return; // was a drag, not a tap
+          UI.openLightbox(img.dataset.lightboxUrl);
+        });
       });
 
-      // ── Touch / mouse swipe ────────────────────────────────
-      let _touchStartX = 0, _touchStartY = 0, _isDragging = false, _dragDeltaX = 0;
+      // ── Mouse drag-to-scroll (desktop) ────────────────────
+      if (needsScroll) {
+        let _mDown = false, _mStartX = 0, _mScrollLeft = 0;
 
-      function _onPointerDown(e) {
-        const pt = e.touches ? e.touches[0] : e;
-        _touchStartX = pt.clientX;
-        _touchStartY = pt.clientY;
-        _isDragging  = false;
-        _dragDeltaX  = 0;
-        track.style.transition = 'none';
-      }
-
-      function _onPointerMove(e) {
-        const pt = e.touches ? e.touches[0] : e;
-        const dx = pt.clientX - _touchStartX;
-        const dy = pt.clientY - _touchStartY;
-        if (!_isDragging && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) {
-          _isDragging = true;
-        }
-        if (_isDragging) {
+        strip.addEventListener('mousedown', (e) => {
+          _mDown      = true;
+          _mStartX    = e.pageX - strip.offsetLeft;
+          _mScrollLeft = strip.scrollLeft;
+          strip.style.cursor = 'grabbing';
+        });
+        strip.addEventListener('mouseleave', () => { _mDown = false; strip.style.cursor = 'grab'; });
+        strip.addEventListener('mouseup',    () => { _mDown = false; strip.style.cursor = 'grab'; });
+        strip.addEventListener('mousemove',  (e) => {
+          if (!_mDown) return;
           e.preventDefault();
-          _dragDeltaX = dx;
-          track.style.transform = `translateX(calc(-${_carouselIdx * 100}% + ${dx}px))`;
-        }
+          const x    = e.pageX - strip.offsetLeft;
+          const walk = (x - _mStartX) * 1.2;
+          strip.scrollLeft = _mScrollLeft - walk;
+        });
       }
-
-      function _onPointerUp() {
-        track.style.transition = 'transform 0.32s cubic-bezier(0.25,0.46,0.45,0.94)';
-        if (_isDragging && Math.abs(_dragDeltaX) > 40) {
-          _goTo(_dragDeltaX < 0 ? _carouselIdx + 1 : _carouselIdx - 1);
-        } else {
-          _goTo(_carouselIdx); // snap back
-        }
-        _isDragging = false;
-        _dragDeltaX = 0;
-      }
-
-      trackWrap.addEventListener('touchstart',  _onPointerDown, { passive: true });
-      trackWrap.addEventListener('touchmove',   _onPointerMove, { passive: false });
-      trackWrap.addEventListener('touchend',    _onPointerUp,   { passive: true });
-      trackWrap.addEventListener('mousedown',   _onPointerDown);
-      trackWrap.addEventListener('mousemove',   e => { if (e.buttons === 1) _onPointerMove(e); });
-      trackWrap.addEventListener('mouseup',     _onPointerUp);
-      trackWrap.addEventListener('mouseleave',  _onPointerUp);
     }
 
     // Bind photo delete buttons (admin only) — works for both single and carousel

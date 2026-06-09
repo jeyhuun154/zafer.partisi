@@ -206,6 +206,7 @@
         headerRegBtn.style.fontSize = '13px';
         headerRegBtn.style.pointerEvents = 'none';
         headerRegBtn.style.boxShadow = 'none';
+        headerRegBtn.style.alignSelf = 'center';
         headerRegBtn.classList.remove('hidden');
       }
     } else {

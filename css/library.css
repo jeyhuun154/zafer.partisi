@@ -763,6 +763,88 @@
 
 .book-form__section-title:first-child { margin-top: 4px; }
 
+/* ── Sort Options List ───────────────────────────────────── */
+.lib-sort-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0 0;
+}
+
+.lib-sort-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lib-sort-option:active {
+  background: var(--color-surface-elevated);
+}
+
+.lib-sort-option svg:first-child {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.lib-sort-option span {
+  flex: 1;
+}
+
+.lib-sort-check {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.lib-sort-option--active {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+}
+
+.lib-sort-option--active svg:first-child {
+  color: var(--color-primary);
+}
+
+.lib-sort-option--active .lib-sort-check {
+  opacity: 1;
+}
+
+/* Glassmorphism overrides for sort options */
+html[data-wallpaper] .lib-sort-option--active {
+  background: rgba(255,255,255,0.18) !important;
+  color: white !important;
+}
+
+html[data-wallpaper] .lib-sort-option--active svg:first-child {
+  color: white !important;
+}
+
+html[data-wallpaper] .lib-sort-option--active .lib-sort-check {
+  color: white !important;
+}
+
+html[data-wallpaper] .lib-sort-option:active {
+  background: rgba(255,255,255,0.1) !important;
+}
+
 /* ── Glassmorphism overrides for library ─────────────────── */
 html[data-wallpaper] .lib-view-toggle {
   background: rgba(255,255,255,0.14) !important;
@@ -788,6 +870,15 @@ html[data-wallpaper] .book-card--list {
 html[data-wallpaper] .book-card--list .book-card__title,
 html[data-wallpaper] .book-card--list .book-card__author {
   color: var(--glass-text) !important;
+}
+
+html[data-wallpaper] #modal-lib-sort .modal-sheet {
+  background: var(--glass-bg-heavy) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-bottom: none !important;
+  box-shadow: var(--glass-shadow) !important;
 }
 
 html[data-wallpaper] #modal-author-info .modal-sheet,
