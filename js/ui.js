@@ -345,7 +345,6 @@ const UI = (() => {
     const firstNameEl = document.getElementById('person-first-name');
     const lastNameEl = document.getElementById('person-last-name');
     const descEl = document.getElementById('person-desc');
-    const phoneEl = document.getElementById('person-phone');
     const instagramEl = document.getElementById('person-instagram');
     const twitterEl = document.getElementById('person-twitter');
     const linkedinEl = document.getElementById('person-linkedin');
@@ -355,7 +354,6 @@ const UI = (() => {
     if (firstNameEl) firstNameEl.value = p.firstName || '';
     if (lastNameEl) lastNameEl.value = p.lastName || '';
     if (descEl) descEl.value = p.description || '';
-    if (phoneEl) phoneEl.value = p.phone || '';
     if (instagramEl) instagramEl.value = p.socials?.instagram || '';
     if (twitterEl) twitterEl.value = p.socials?.twitter || '';
     if (linkedinEl) linkedinEl.value = p.socials?.linkedin || '';
@@ -381,7 +379,6 @@ const UI = (() => {
     const firstNameEl = document.getElementById('person-first-name');
     const lastNameEl = document.getElementById('person-last-name');
     const descEl = document.getElementById('person-desc');
-    const phoneEl = document.getElementById('person-phone');
     const instagramEl = document.getElementById('person-instagram');
     const twitterEl = document.getElementById('person-twitter');
     const linkedinEl = document.getElementById('person-linkedin');
@@ -392,7 +389,6 @@ const UI = (() => {
       firstName:   firstNameEl ? firstNameEl.value.trim() : '',
       lastName:    lastNameEl ? lastNameEl.value.trim() : '',
       description: descEl ? descEl.value.trim() : '',
-      phone:       phoneEl ? phoneEl.value.trim() : '',
       photoURL:    document.getElementById('person-photo-url')?.value.trim() || '',
       photoBase64: '',
       extraLinks:  _getExtraLinks(),
@@ -722,20 +718,6 @@ const UI = (() => {
     });
   }
 
-  function buildPhoneLink(phone) {
-    if (!phone) return '';
-    // Keep only digits and a leading + for the tel: URI; the visible label is not shown,
-    // this is an icon-only tap target like the social icons.
-    const telHref = phone.trim().replace(/(?!^)[^\d]/g, '');
-    return `
-      <a href="tel:${_escAttr(telHref)}" class="social-link" aria-label="Telefon: ${_escHtml(phone)}"
-         style="color:var(--color-primary)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-        </svg>
-      </a>`;
-  }
-
   function buildSocialLinks(socials = {}) {
     let html = '';
     Object.entries(socials).forEach(([platform, url]) => {
@@ -792,7 +774,7 @@ const UI = (() => {
     openPersonModal, closePersonModal, getPersonFormData, bindPhotoUpload,
     openUsersModal, closeUsersModal, renderUsersList,
     bindPasswordToggle,
-    buildSocialLinks, buildPhoneLink, SOCIAL_ICONS, SOCIAL_COLORS,
+    buildSocialLinks, SOCIAL_ICONS, SOCIAL_COLORS,
     _escHtml, _showToast
   };
 })();
@@ -879,9 +861,9 @@ const UIExtended = {
       notesSection?.classList.add('hidden');
     }
 
-    // Phone + Socials
+    // Socials
     const socialsRow = document.getElementById('see-more-socials-row');
-    if (socialsRow) socialsRow.innerHTML = UI.buildPhoneLink(person.phone) + UI.buildSocialLinks(person.socials || {});
+    if (socialsRow) socialsRow.innerHTML = UI.buildSocialLinks(person.socials || {});
 
     // Admin: show notes editor
     const adminRow = document.getElementById('see-more-admin-row');
