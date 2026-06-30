@@ -47,35 +47,6 @@
   color-scheme: dark;
 }
 
-/* ── Leaflet Map Popup — follow theme in dark mode ───────── */
-/* Leaflet ships its own white popup chrome by default; override it so the
-   marker popup (title, description, action buttons) matches the dark theme
-   instead of staying white while the map tiles around it go dark.
-   Scoped to plain dark mode (no wallpaper) — the data-wallpaper variant
-   already has its own glass-style popup overrides further down this file. */
-html:not([data-wallpaper])[data-theme="dark"] .leaflet-popup-content-wrapper {
-  background: var(--color-surface-elevated) !important;
-  color: var(--color-text) !important;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.5) !important;
-}
-html:not([data-wallpaper])[data-theme="dark"] .leaflet-popup-tip {
-  background: var(--color-surface-elevated) !important;
-  box-shadow: none !important;
-}
-html:not([data-wallpaper])[data-theme="dark"] .leaflet-popup-content {
-  color: var(--color-text) !important;
-}
-html:not([data-wallpaper])[data-theme="dark"] .leaflet-popup-content b,
-html:not([data-wallpaper])[data-theme="dark"] .leaflet-popup-content small {
-  color: var(--color-text) !important;
-}
-html:not([data-wallpaper])[data-theme="dark"] .leaflet-popup-content small[style*="color:orange"] {
-  color: #FFA726 !important; /* keep the "scheduled" notice legible on dark bg */
-}
-html:not([data-wallpaper])[data-theme="dark"] .leaflet-popup-close-button {
-  color: var(--color-text-secondary) !important;
-}
-
 /* ── Light Theme (Clean / Minimal / "Vergi Dairesi") ────── */
 [data-theme="light"] {
   --color-bg:               #FFFFFF;
