@@ -223,11 +223,12 @@
   <!-- ── Screen: Home ───────────────────────────── -->
   <div id="screen-home" class="screen">
     <header class="app-header" style="gap:6px">
-      <!-- Guest: show register button / Hoş geldin greeting, centered between social bar and settings -->
+      <div class="app-header__spacer"></div>
+      <!-- Guest: show register button to left of settings -->
       <button id="header-register-btn" class="header-register-btn hidden" aria-label="Kayıt Ol">
         Kayıt Ol
       </button>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-left:auto">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
         <button id="settings-btn" class="icon-btn" aria-label="Ayarlar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
@@ -505,10 +506,6 @@
         <div class="form-group">
           <label class="form-label">Açıklama / Unvan</label>
           <textarea id="person-desc" class="form-input form-textarea" placeholder="Ör: İl Başkanı, Milletvekili Adayı..."></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Telefon Numarası <span style="opacity:.5;font-weight:400">(opsiyonel)</span></label>
-          <input type="tel" id="person-phone" class="form-input" placeholder="+90 5XX XXX XX XX">
         </div>
         <p class="form-label" style="margin-bottom:8px">Sosyal Medya <span style="opacity:.5;font-weight:400">(opsiyonel)</span></p>
         <div class="social-inputs">
