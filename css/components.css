@@ -1325,17 +1325,25 @@
   min-height: 56px;
   align-items: center;
   justify-content: flex-end;
+  position: relative; /* anchor for absolutely centered greeting */
 }
 
-/* Welcome text: flex-shrink so it never pushes into the social bar area,
-   min-width: 0 allows text-overflow truncation on very long names */
-#screen-home .app-header > *:not(.icon-btn):not(button) {
+/* Welcome text: absolutely centered in the space between the social bar
+   (top-left, ends ~140px from left) and the settings column (top-right, ~56px wide).
+   Using position:absolute + transform keeps it visually centered regardless of
+   name length, while max-width + ellipsis prevents overflow for long names. */
+#screen-home .app-header > #header-register-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: calc(100vw - 180px); /* reserve ~140px for social bar, ~64px for settings col */
   flex-shrink: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: calc(100vw - 160px); /* reserve space: ~40px social icons area + ~40px settings btn + padding */
+  margin-right: 0;
 }
 
 /* ── Register screen scrollable ──────────────────────────── */
@@ -1768,7 +1776,7 @@
   color: var(--color-primary);
 }
 
-.orgtree-profile__name-group { flex: 1; }
+.orgtree-profile__name-group { flex: 1; min-width: 0; }
 
 .orgtree-profile__name {
   font-family: 'Syne', sans-serif;
@@ -1778,6 +1786,9 @@
   margin-bottom: 5px;
   letter-spacing: -0.02em;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .orgtree-profile__title {
