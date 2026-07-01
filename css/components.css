@@ -1773,10 +1773,9 @@
 .orgtree-profile__name {
   font-family: 'Syne', sans-serif;
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-text);
   margin-bottom: 5px;
-  letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
