@@ -197,6 +197,7 @@
         headerRegBtn.style.cssText = '';
         headerRegBtn.style.pointerEvents = 'auto';
         headerRegBtn.classList.remove('hidden');
+        headerRegBtn.classList.remove('header-register-btn--welcome');
       }
     } else if (user && !isGuest) {
       if (headerRegBtn) {
@@ -208,9 +209,13 @@
         headerRegBtn.style.boxShadow = 'none';
         headerRegBtn.style.alignSelf = 'center';
         headerRegBtn.classList.remove('hidden');
+        headerRegBtn.classList.add('header-register-btn--welcome');
       }
     } else {
-      if (headerRegBtn) headerRegBtn.classList.add('hidden');
+      if (headerRegBtn) {
+        headerRegBtn.classList.add('hidden');
+        headerRegBtn.classList.remove('header-register-btn--welcome');
+      }
     }
 
     // Settings: show/hide logout & admin section

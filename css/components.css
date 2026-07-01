@@ -1327,9 +1327,30 @@
   justify-content: flex-end;
 }
 
+/* Spacer mirrors the actual width of .home-social-bar (3 icons + gaps + padding
+   = 168px, minus the 4px header gap that follows it) so that the welcome text
+   after it starts exactly where the social icon bar ends. Without this, the
+   default 40px spacer under-reserves the space and the centering below is off. */
+#screen-home .app-header__spacer {
+  width: 164px;
+}
+
+/* Centered "Hoş geldin, <Name>" welcome text — takes up all the leftover space
+   between the spacer and the settings icon, and centers its text inside that
+   space, so it sits evenly between the social icons (top-left) and settings
+   icon (top-right) no matter how long the name is. Only applied to the
+   logged-in state; the guest "Kayıt Ol" button keeps its normal pill size. */
+#screen-home .app-header .header-register-btn--welcome {
+  flex: 1 1 auto;
+  justify-content: center;
+  text-align: center;
+  margin-right: 0;
+  padding: 0; /* no pill background on this state, so no need to reserve button padding */
+}
+
 /* Welcome text: flex-shrink so it never pushes into the social bar area,
    min-width: 0 allows text-overflow truncation on very long names */
-#screen-home .app-header > *:not(.icon-btn):not(button) {
+#screen-home .app-header > *:not(.icon-btn) {
   flex-shrink: 1;
   min-width: 0;
   overflow: hidden;
