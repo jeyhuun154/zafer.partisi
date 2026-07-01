@@ -101,6 +101,11 @@ const People = (() => {
     }
 
     const socialsHtml = UI.buildSocialLinks(person.socials || {});
+    const phoneHtml = person.phone ? `
+        <a href="tel:${UI._escHtml(person.phone.replace(/[^\d+]/g, ''))}" class="social-link people-card__phone-link"
+           aria-label="Ara" style="color:${UI.SOCIAL_COLORS.phone}" onclick="event.stopPropagation()">
+          ${UI.SOCIAL_ICONS.phone}
+        </a>` : '';
     const adminActions = isAdmin ? `
       <div class="people-card__admin-actions">
         <button class="card-action-btn card-action-btn--edit" data-id="${person.id}" aria-label="Düzenle">
@@ -133,7 +138,7 @@ const People = (() => {
         <div class="people-card__info">
           <p class="people-card__name">${UI._escHtml(person.firstName)} ${UI._escHtml(person.lastName)}</p>
           ${person.description ? `<p class="people-card__desc">${UI._escHtml(person.description)}</p>` : ''}
-          ${socialsHtml ? `<div class="people-card__socials">${socialsHtml}</div>` : ''}
+          ${(phoneHtml || socialsHtml) ? `<div class="people-card__socials">${phoneHtml}${socialsHtml}</div>` : ''}
         </div>
       </div>`;
   }
@@ -187,6 +192,7 @@ const People = (() => {
       lastName:    data.lastName,
       description: data.description || '',
       notes:       data.notes !== undefined ? data.notes : (existing?.notes || ''),
+      phone:       data.phone !== undefined ? (data.phone || null) : (existing?.phone || null),
       photoURL:    data.photoURL || existing?.photoURL || null,
       socials:     { ...(data.socials || {}), extraLinks: data.extraLinks || [] },
       order:       existing?.order ?? Date.now(),

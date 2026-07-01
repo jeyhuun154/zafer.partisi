@@ -27,6 +27,9 @@ const UI = (() => {
     youtube: `<svg viewBox="0 0 24 24" fill="currentColor">
       <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
       <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/>
+    </svg>`,
+    phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
     </svg>`
   };
 
@@ -36,7 +39,8 @@ const UI = (() => {
     twitter:   '#000000',
     linkedin:  '#0077B5',
     facebook:  '#1877F2',
-    youtube:   '#FF0000'
+    youtube:   '#FF0000',
+    phone:     '#2FAE60'
   };
 
   // ── Init ─────────────────────────────────────────────────
@@ -323,7 +327,7 @@ const UI = (() => {
   }
 
   function _clearPersonForm() {
-    ['person-first-name','person-last-name','person-desc',
+    ['person-first-name','person-last-name','person-desc','person-phone',
      'person-instagram','person-twitter','person-linkedin',
      'person-facebook','person-youtube'].forEach(id => {
       const el = document.getElementById(id);
@@ -345,6 +349,7 @@ const UI = (() => {
     const firstNameEl = document.getElementById('person-first-name');
     const lastNameEl = document.getElementById('person-last-name');
     const descEl = document.getElementById('person-desc');
+    const phoneEl = document.getElementById('person-phone');
     const instagramEl = document.getElementById('person-instagram');
     const twitterEl = document.getElementById('person-twitter');
     const linkedinEl = document.getElementById('person-linkedin');
@@ -354,6 +359,7 @@ const UI = (() => {
     if (firstNameEl) firstNameEl.value = p.firstName || '';
     if (lastNameEl) lastNameEl.value = p.lastName || '';
     if (descEl) descEl.value = p.description || '';
+    if (phoneEl) phoneEl.value = p.phone || '';
     if (instagramEl) instagramEl.value = p.socials?.instagram || '';
     if (twitterEl) twitterEl.value = p.socials?.twitter || '';
     if (linkedinEl) linkedinEl.value = p.socials?.linkedin || '';
@@ -379,6 +385,7 @@ const UI = (() => {
     const firstNameEl = document.getElementById('person-first-name');
     const lastNameEl = document.getElementById('person-last-name');
     const descEl = document.getElementById('person-desc');
+    const phoneEl = document.getElementById('person-phone');
     const instagramEl = document.getElementById('person-instagram');
     const twitterEl = document.getElementById('person-twitter');
     const linkedinEl = document.getElementById('person-linkedin');
@@ -389,6 +396,7 @@ const UI = (() => {
       firstName:   firstNameEl ? firstNameEl.value.trim() : '',
       lastName:    lastNameEl ? lastNameEl.value.trim() : '',
       description: descEl ? descEl.value.trim() : '',
+      phone:       phoneEl ? phoneEl.value.trim() : '',
       photoURL:    document.getElementById('person-photo-url')?.value.trim() || '',
       photoBase64: '',
       extraLinks:  _getExtraLinks(),
@@ -863,7 +871,12 @@ const UIExtended = {
 
     // Socials
     const socialsRow = document.getElementById('see-more-socials-row');
-    if (socialsRow) socialsRow.innerHTML = UI.buildSocialLinks(person.socials || {});
+    const phoneHtml = person.phone ? `
+        <a href="tel:${UI._escHtml(person.phone.replace(/[^\d+]/g, ''))}" class="social-link"
+           aria-label="Ara" style="color:${UI.SOCIAL_COLORS.phone}">
+          ${UI.SOCIAL_ICONS.phone}
+        </a>` : '';
+    if (socialsRow) socialsRow.innerHTML = phoneHtml + UI.buildSocialLinks(person.socials || {});
 
     // Admin: show notes editor
     const adminRow = document.getElementById('see-more-admin-row');
