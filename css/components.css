@@ -209,6 +209,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  /* Sit above .app-header (z-index:10) / .home-social-bar (z-index:15) so the
+     logo isn't covered by the translucent glass header on wallpaper themes —
+     the header's height (~104px incl. stacked settings/notif icons) slightly
+     overlaps the top of this 120px logo box, which reads as a dark tint once
+     the header gets its frosted background. */
+  z-index: 20;
 }
 
 .home__logo {
