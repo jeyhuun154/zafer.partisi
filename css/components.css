@@ -1408,6 +1408,34 @@
   filter: brightness(0.72) invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.85) saturate(0.6);
 }
 
+/* Marker popup — follow the app theme instead of Leaflet's default white
+   (skip when a wallpaper/glass theme is active; that has its own styling) */
+html[data-theme="dark"]:not([data-wallpaper]) .leaflet-popup-content-wrapper {
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
+  box-shadow: 0 8px 28px var(--color-card-shadow);
+}
+
+html[data-theme="dark"]:not([data-wallpaper]) .leaflet-popup-tip {
+  background: var(--color-surface-elevated);
+}
+
+html[data-theme="dark"]:not([data-wallpaper]) .leaflet-popup-content {
+  color: var(--color-text);
+}
+
+html[data-theme="dark"]:not([data-wallpaper]) .leaflet-popup-content a {
+  color: var(--color-primary);
+}
+
+html[data-theme="dark"]:not([data-wallpaper]) .leaflet-popup-close-button {
+  color: var(--color-text-secondary) !important;
+}
+
+html[data-theme="dark"]:not([data-wallpaper]) .leaflet-popup-close-button:hover {
+  color: var(--color-text) !important;
+}
+
 /* Markers always above dim overlay (z=350) */
 .leaflet-marker-pane,
 .leaflet-popup-pane,
