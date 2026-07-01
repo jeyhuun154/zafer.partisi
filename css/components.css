@@ -1346,6 +1346,9 @@
   text-align: center;
   margin-right: 0;
   padding: 0; /* no pill background on this state, so no need to reserve button padding */
+  height: 40px; /* matches the settings icon's height so both sit at the same visual row,
+                   instead of the text centering across the full header (which is taller
+                   because the settings + notification-bell icons are stacked below it) */
 }
 
 /* Welcome text: flex-shrink so it never pushes into the social bar area,

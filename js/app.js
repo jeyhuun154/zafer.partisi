@@ -207,7 +207,7 @@
         headerRegBtn.style.fontSize = '13px';
         headerRegBtn.style.pointerEvents = 'none';
         headerRegBtn.style.boxShadow = 'none';
-        headerRegBtn.style.alignSelf = 'center';
+        headerRegBtn.style.alignSelf = 'flex-start';
         headerRegBtn.classList.remove('hidden');
         headerRegBtn.classList.add('header-register-btn--welcome');
       }
